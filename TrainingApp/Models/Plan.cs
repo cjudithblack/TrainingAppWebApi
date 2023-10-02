@@ -13,7 +13,7 @@ namespace TrainingApp.Models
         public int PlanId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
         public virtual ICollection<Workout> Workouts { get; set; }

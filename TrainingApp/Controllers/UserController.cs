@@ -31,7 +31,7 @@ namespace TrainingApp.Controllers
                 if (result.Succeeded)
                 {
                     // Optionally, sign the user in after registration
-                    // await _signInManager.SignInAsync(user, isPersistent: false);
+                    await _signInManager.SignInAsync(user, isPersistent: false);
 
                     return Ok(new { message = "Registration successful" });
                 }
@@ -48,7 +48,8 @@ namespace TrainingApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var user = _userManager.FindByEmailAsync(model.Email).Result;
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {

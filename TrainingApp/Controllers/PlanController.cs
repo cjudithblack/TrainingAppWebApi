@@ -18,7 +18,7 @@ namespace TrainingApp.Controllers
         [HttpGet("{UserId}")]
         public async Task<IEnumerable<Plan>> Get(int userId)
         {
-            return await _dataBase.Plans.Where(plan => plan.UserId == userId).ToListAsync();
+            return await _dataBase.Plans.Where(plan => plan.UserId == userId.ToString()).ToListAsync();
         }
 
 
@@ -27,7 +27,7 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> getPlan(int userId, int planId)
         {
-            var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId);
+            var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId.ToString());
             return plan == null ? NotFound() : Ok(plan);
         }
 

@@ -15,10 +15,12 @@ namespace TrainingApp.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string VideoUrl { get; set; }
-        public string UserId { get; set; }
-        [ForeignKey("UserId")]
+
         public virtual ICollection<ExerciseInWorkout> ExerciseInWorkouts { get; set; }
         public virtual ICollection<CompletedSet> CompletedSets { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
         public virtual User User { get; set; }
     }
 }
