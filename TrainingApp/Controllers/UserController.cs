@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TrainingApp.Models;
 
 namespace TrainingApp.Controllers
@@ -30,7 +32,6 @@ namespace TrainingApp.Controllers
 
                 if (result.Succeeded)
                 {
-                    // Optionally, sign the user in after registration
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
                     return Ok(new { message = "Registration successful" });
@@ -49,7 +50,7 @@ namespace TrainingApp.Controllers
             if (ModelState.IsValid)
             {
                 var user = _userManager.FindByEmailAsync(model.Email).Result;
-                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(user?.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
@@ -62,6 +63,15 @@ namespace TrainingApp.Controllers
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpPost("logout")]
+        [Authorize] 
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            return Ok(new { message = "Logout successful" });
         }
 
     }

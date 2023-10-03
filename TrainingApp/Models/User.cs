@@ -6,14 +6,11 @@ namespace TrainingApp.Models
 {
     public class User : IdentityUser
     {
-        private static int currentId = 1;
 
         public User() {
-            this.Id = currentId++.ToString();
         }
         public User(string name, string email)
         {
-            this.Id = currentId++.ToString();
             this.UserName = name;
             this.Email = email;
             this.Plans = new HashSet<Plan>();

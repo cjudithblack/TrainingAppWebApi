@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using TrainingApp.Data;
 using TrainingApp.Models;
 
@@ -8,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -18,6 +19,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 builder.Services.AddIdentity<User, IdentityRole>(options => { options.User.RequireUniqueEmail = true; })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
+    options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);
 
 var app = builder.Build();
 
@@ -30,6 +34,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

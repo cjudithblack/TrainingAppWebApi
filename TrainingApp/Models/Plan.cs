@@ -7,7 +7,16 @@ namespace TrainingApp.Models
     {
         public Plan()
         {
+            
+        }
+
+        public Plan(string name, string description, User user)
+        {
+            this.Name = name;
+            this.Description = description;
             this.Workouts = new HashSet<Workout>();
+            this.User = user;
+            this.UserId = user.Id;
         }
         [Key]
         public int PlanId { get; set; }

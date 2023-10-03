@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrainingApp.Data;
 
@@ -11,9 +12,11 @@ using TrainingApp.Data;
 namespace TrainingApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231002170256_planCtor")]
+    partial class planCtor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,7 +193,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("ParentWorkoutSessionDate", "ParentWorkoutSessionWorkoutId");
 
-                    b.ToTable("CompletedSets", (string)null);
+                    b.ToTable("CompletedSets");
                 });
 
             modelBuilder.Entity("TrainingApp.Models.Exercise", b =>
@@ -221,7 +224,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Exercises", (string)null);
+                    b.ToTable("Exercises");
                 });
 
             modelBuilder.Entity("TrainingApp.Models.ExerciseInWorkout", b =>
@@ -250,7 +253,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("ExerciseId");
 
-                    b.ToTable("ExerciseInWorkouts", (string)null);
+                    b.ToTable("ExerciseInWorkouts");
                 });
 
             modelBuilder.Entity("TrainingApp.Models.Plan", b =>
@@ -277,7 +280,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Plans", (string)null);
+                    b.ToTable("Plans");
                 });
 
             modelBuilder.Entity("TrainingApp.Models.Session", b =>
@@ -294,7 +297,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("WorkoutId");
 
-                    b.ToTable("Sessions", (string)null);
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("TrainingApp.Models.User", b =>
@@ -385,7 +388,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("PlanId");
 
-                    b.ToTable("Workouts", (string)null);
+                    b.ToTable("Workouts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
