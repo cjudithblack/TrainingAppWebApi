@@ -16,6 +16,7 @@ namespace TrainingApp.Models
             this.Plans = new HashSet<Plan>();
             this.Exercises = new HashSet<Exercise>();
         }
+        public int CurrentPlanId { get; set; }
         public virtual ICollection<Plan> Plans { get; set; }
         public virtual ICollection<Exercise> Exercises { get; set; }
     }

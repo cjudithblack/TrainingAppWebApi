@@ -5,10 +5,7 @@ namespace TrainingApp.Models
 {
     public class Plan
     {
-        public Plan()
-        {
-            
-        }
+        public Plan() { }
 
         public Plan(string name, string description, User user)
         {
@@ -20,8 +17,9 @@ namespace TrainingApp.Models
         }
         [Key]
         public int PlanId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public int CurrentWorkoutId { get; set; }
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
