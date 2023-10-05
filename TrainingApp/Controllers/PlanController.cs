@@ -47,7 +47,7 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody] AddPlan newPlan)
+        public async Task<IActionResult> Create([FromBody] PlanAdd newPlan)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             User currentUser = _userManager.FindByIdAsync(userId).Result;
@@ -66,7 +66,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> updatePlan([FromRoute] int id, [FromBody] UpdatePlan updatedPlan)
+        public async Task<IActionResult> UpdatePlan([FromRoute] int id, [FromBody] PlanUpdate updatedPlan)
         {
             var plan = await _dataBase.Plans.FindAsync(id);
             if (plan != null)

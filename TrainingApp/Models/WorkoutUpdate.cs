@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TrainingApp.Models
+﻿namespace TrainingApp.Models
 {
-    public class AddPlan
+    public class WorkoutUpdate
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        //public int PlanId { get; set; }
 
     }
 }

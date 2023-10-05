@@ -44,7 +44,7 @@ namespace TrainingApp.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody] AddExercise newExercise)
+        public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Exercise exercise = new Exercise
@@ -61,7 +61,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPut("UpdateExercise/{id}")]
-        public async Task<IActionResult> updateExercise([FromRoute] int id, [FromBody] UpdateExercise updatedExercise)
+        public async Task<IActionResult> UpdateExercise([FromRoute] int id, [FromBody] ExerciseUpdate updatedExercise)
         {
             var exercise = await _dataBase.Exercises.FindAsync(id);
             if (exercise != null)
@@ -79,7 +79,6 @@ namespace TrainingApp.Controllers
         [HttpDelete("Delete/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize]
         public async Task<IActionResult> DeleteExercise([FromRoute] int id)
         {

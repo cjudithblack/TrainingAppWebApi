@@ -11,9 +11,9 @@ namespace TrainingApp.Models
         {
             this.CompletedSets = new HashSet<CompletedSet>();
         }
-        [Key, Column(Order = 1)]
+        [Key]
+        public int SessionId;
         public System.DateTime Date { get; set; }
-        [Key, Column(Order = 2)]
         public int WorkoutId { get; set; }
         [ForeignKey("WorkoutId")]
         public virtual Workout Workout { get; set; }

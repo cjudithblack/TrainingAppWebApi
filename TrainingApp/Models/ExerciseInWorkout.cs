@@ -14,7 +14,7 @@ namespace TrainingApp.Models
 
         public int NumOfSets { get; set; }
         public int NumOfReps { get; set; }
-        public Nullable<System.TimeSpan> RestTime { get; set; }
+        public TimeSpan? RestTime { get; set; }
         public string? Notes { get; set; }
         [ForeignKey("WorkoutId")]
         public virtual Workout? Workout { get; set; }

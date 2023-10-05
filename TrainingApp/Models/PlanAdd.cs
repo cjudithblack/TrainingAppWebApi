@@ -1,6 +1,8 @@
-﻿namespace TrainingApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TrainingApp.Models
 {
-    public class UpdatePlan
+    public class PlanAdd
     {
         public string Name { get; set; }
         public string Description { get; set; }

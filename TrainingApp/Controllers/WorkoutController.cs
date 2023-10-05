@@ -61,8 +61,9 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("/Plans/{planId}/CreateWorkout")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(AddWorkout newWorkout, [FromRoute] int planId)
+        public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
         {
             Workout workout = new Workout {
                 Name = newWorkout.Name,
@@ -79,7 +80,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPut("UpdateWorkout/{id}")]
-        public async Task<IActionResult> updateWorkout([FromRoute] int id, [FromBody] UpdateWorkout updatedWorkout)
+        public async Task<IActionResult> UpdateWorkout([FromRoute] int id, [FromBody] WorkoutUpdate updatedWorkout)
         {
             var workout = await _dataBase.Workouts.FindAsync(id);
             if (workout != null)
@@ -96,9 +97,8 @@ namespace TrainingApp.Controllers
         [HttpDelete("DeleteWorkout/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize]
-        public async Task<IActionResult> DeletePlan([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var workout = await _dataBase.Workouts.FindAsync(id);
             if (workout != null)

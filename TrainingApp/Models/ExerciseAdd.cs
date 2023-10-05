@@ -1,10 +1,9 @@
 ﻿namespace TrainingApp.Models
 {
-    public class UpdateWorkout
+    public class ExerciseAdd
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        //public int PlanId { get; set; }
-
+        public string VideoUrl { get; set; }
     }
 }
