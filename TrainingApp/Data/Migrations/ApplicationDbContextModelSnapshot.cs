@@ -190,7 +190,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("ParentWorkoutSessionDate", "ParentWorkoutSessionWorkoutId");
 
-                    b.ToTable("CompletedSets");
+                    b.ToTable("CompletedSets", (string)null);
                 });
 
             modelBuilder.Entity("TrainingApp.Models.Exercise", b =>
@@ -221,7 +221,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Exercises");
+                    b.ToTable("Exercises", (string)null);
                 });
 
             modelBuilder.Entity("TrainingApp.Models.ExerciseInWorkout", b =>
@@ -250,7 +250,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("ExerciseId");
 
-                    b.ToTable("ExerciseInWorkouts");
+                    b.ToTable("ExerciseInWorkouts", (string)null);
                 });
 
             modelBuilder.Entity("TrainingApp.Models.Plan", b =>
@@ -261,13 +261,12 @@ namespace TrainingApp.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanId"));
 
-                    b.Property<int>("CurrentWorkoutId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -278,7 +277,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Plans");
+                    b.ToTable("Plans", (string)null);
                 });
 
             modelBuilder.Entity("TrainingApp.Models.Session", b =>
@@ -295,7 +294,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("WorkoutId");
 
-                    b.ToTable("Sessions");
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("TrainingApp.Models.User", b =>
@@ -309,9 +308,6 @@ namespace TrainingApp.Data.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CurrentPlanId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -389,7 +385,7 @@ namespace TrainingApp.Data.Migrations
 
                     b.HasIndex("PlanId");
 
-                    b.ToTable("Workouts");
+                    b.ToTable("Workouts", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

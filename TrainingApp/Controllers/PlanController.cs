@@ -60,26 +60,9 @@ namespace TrainingApp.Controllers
                 Description = newPlan.Description,
                 User = currentUser
             };
-            List<Plan> UsersPlans = await _dataBase.Plans.Where(plan => plan.UserId == userId).ToListAsync();
-            if (UsersPlans?.Count == 0) //when creating the first plan - it will be the current plan
-                currentUser.CurrentPlanId = plan.PlanId;
             await _dataBase.Plans.AddAsync(plan);
             await _dataBase.SaveChangesAsync();
             return CreatedAtAction(nameof(GetPlan), new { planId = plan.PlanId }, plan);
-        }
-
-        [HttpPatch("Start/{id}")]
-        public async Task<IActionResult> StartPlan([FromRoute] int id)
-        {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return BadRequest("You need to sign in in order to start a plan");
-            User? user = await _dataBase.Users.FindAsync(userId);
-            user.CurrentPlanId = id;
-            Plan? plan = await _dataBase.Plans.FindAsync(user.CurrentPlanId);
-            if (plan == null)
-                return NotFound();
-            return Ok(plan);
         }
 
         [HttpPut("Update/{id}")]

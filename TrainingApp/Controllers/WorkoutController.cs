@@ -71,27 +71,12 @@ namespace TrainingApp.Controllers
             Plan? plan = await _dataBase.Plans.FindAsync(planId);
             if (plan == null)
                 return BadRequest(ModelState);
-            List<Workout> PlansWorkouts = await _dataBase.Workouts.Where(workout => workout.PlanId == plan.PlanId).ToListAsync();
-            if (PlansWorkouts?.Count == 0) //when creating the first workout - it will be the current workout
-                plan.CurrentWorkoutId = workout.WorkoutId;
             await _dataBase.Workouts.AddAsync(workout);
             await _dataBase.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetWorkout), new { id = workout.WorkoutId }, workout);
         }
 
-        [HttpPatch("StartWorkout/{id}")]
-        public async Task<IActionResult> StartWorkout([FromRoute] int id)
-        {
-            Workout? workout = await _dataBase.Workouts.FindAsync(id);
-            if (workout == null)
-                return NotFound();
-            Plan currentPlan = await _dataBase.Plans.FirstAsync(plan => workout.PlanId == plan.PlanId);
-            if (currentPlan == null)
-                return BadRequest(ModelState);
-            currentPlan.CurrentWorkoutId = id;
-            return Ok(workout);
-        }
 
         [HttpPut("UpdateWorkout/{id}")]
         public async Task<IActionResult> updateWorkout([FromRoute] int id, [FromBody] UpdateWorkout updatedWorkout)
