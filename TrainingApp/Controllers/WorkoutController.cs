@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Numerics;
 using TrainingApp.Data.Migrations;
+using Microsoft.AspNetCore.Identity;
 
 namespace TrainingApp.Controllers
 {
@@ -65,6 +66,13 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
         {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? plansUser = _dataBase.Plans.Find(planId)?.UserId;
+            if (plansUser != userId)
+                return NotFound();
+            Workout? workoutNameExists = _dataBase.Workouts.FirstOrDefaultAsync(workout => workout.PlanId == planId && workout.Name == newWorkout.Name).Result;
+            if (workoutNameExists != null)
+                return BadRequest("You already have a workout with the same name");
             Workout workout = new Workout {
                 Name = newWorkout.Name,
                 Description = newWorkout.Description,
@@ -75,7 +83,7 @@ namespace TrainingApp.Controllers
             await _dataBase.Workouts.AddAsync(workout);
             await _dataBase.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetWorkout), new { id = workout.WorkoutId }, workout);
+            return CreatedAtAction(nameof(GetWorkout), new { planId = planId, id = workout.WorkoutId }, workout);
         }
 
 

@@ -8,12 +8,12 @@ namespace TrainingApp.Models
         [Key]
         public int SetId { get; set; }
         public int ExerciseId { get; set; }
-        public System.DateTime Date { get; set; }
-        public int WorkoutId { get; set; }
+        public int WorkoutSessionId { get; set; }
         public int? Weight { get; set; }
         public int? Reps { get; set; }
+        public string? Notes { get; set; }
 
-        [ForeignKey("ParentWorkoutSession")]
+        [ForeignKey("WorkoutSessionId")]
         public virtual Session? ParentWorkoutSession { get; set; }
         [ForeignKey("ExerciseId")]
         public virtual Exercise? Exercise { get; set; }

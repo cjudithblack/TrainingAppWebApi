@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 using System.Security.Claims;
 using TrainingApp.Data;
 using TrainingApp.Models;
@@ -60,6 +61,9 @@ namespace TrainingApp.Controllers
                 Description = newPlan.Description,
                 User = currentUser
             };
+            List<Plan> UsersPlans = await _dataBase.Plans.Where(plan => plan.UserId == userId).ToListAsync();
+            if (UsersPlans?.Count == 0) //when creating the first plan - it will be the current plan
+                currentUser.CurrentPlanId = plan.PlanId;
             await _dataBase.Plans.AddAsync(plan);
             await _dataBase.SaveChangesAsync();
             return CreatedAtAction(nameof(GetPlan), new { planId = plan.PlanId }, plan);
@@ -98,6 +102,16 @@ namespace TrainingApp.Controllers
                 return Ok();
             }
             return NotFound();
+        }
+
+        [HttpPatch("SetAsCurrent/{id}")]
+        [Authorize]
+        public async Task<IActionResult> SetAsCurrent([FromRoute] int id)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User ? user = await _dataBase.Users.FindAsync(userId);
+            user.CurrentPlanId = id;
+            return Ok();
         }
 
     }
