@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace TrainingApp.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PlanController : ControllerBase
     {
         private readonly ApplicationDbContext _dataBase;
@@ -23,7 +25,6 @@ namespace TrainingApp.Controllers
 
 
         [HttpGet]
-        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get()
@@ -34,20 +35,18 @@ namespace TrainingApp.Controllers
 
 
         [HttpGet("{planId}")]
-        [Authorize]
         [ProducesResponseType(typeof(Plan), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPlan([FromRoute] int planId)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId);
+            Plan? plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId);
             return plan == null ? NotFound() : Ok(plan);
         }
 
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize]
         public async Task<IActionResult> Create([FromBody] PlanAdd newPlan)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -61,9 +60,9 @@ namespace TrainingApp.Controllers
                 Description = newPlan.Description,
                 User = currentUser
             };
-            List<Plan> UsersPlans = await _dataBase.Plans.Where(plan => plan.UserId == userId).ToListAsync();
-            if (UsersPlans?.Count == 0) //when creating the first plan - it will be the current plan
+            if (currentUser.Plans.Count == 0) //when creating the first plan - it will be the current plan
                 currentUser.CurrentPlanId = plan.PlanId;
+            //_dataBase.Users.Attach(plan.User);
             await _dataBase.Plans.AddAsync(plan);
             await _dataBase.SaveChangesAsync();
             return CreatedAtAction(nameof(GetPlan), new { planId = plan.PlanId }, plan);
@@ -88,7 +87,6 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize]
         public async Task<IActionResult> DeletePlan([FromRoute] int id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -105,7 +103,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPatch("SetAsCurrent/{id}")]
-        [Authorize]
         public async Task<IActionResult> SetAsCurrent([FromRoute] int id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

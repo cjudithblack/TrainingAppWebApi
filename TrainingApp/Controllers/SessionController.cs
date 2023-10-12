@@ -53,7 +53,10 @@ namespace TrainingApp.Controllers
                 return BadRequest(ModelState);
             await _dataBase.Sessions.AddAsync(session);
             await _dataBase.SaveChangesAsync();
-
+            Plan? plan = workout.Plan;
+            var workoutList = plan.Workouts.OrderBy(workout => workout.WorkoutId).ToList();
+            var currentWorkoutIndex = workoutList.IndexOf(workout);
+            plan.NextWorkoutId = workoutList[(currentWorkoutIndex + 1) % workoutList.Count].WorkoutId;
             return CreatedAtAction(nameof(GetSession), new { SessionId = session.SessionId }, session);
         }
     }

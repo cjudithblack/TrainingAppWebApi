@@ -8,6 +8,8 @@ namespace TrainingApp.Models
     {
 
         public User() {
+            this.Plans = new HashSet<Plan>();
+            this.Exercises = new HashSet<Exercise>();
         }
         public User(string name, string email)
         {

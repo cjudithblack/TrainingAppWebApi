@@ -62,7 +62,7 @@ namespace TrainingApp.Controllers
                     // Create claims for the user
                     var claims = new[]
                     {
-                        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -70,8 +70,8 @@ namespace TrainingApp.Controllers
                     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                     var token = new JwtSecurityToken(
-                        issuer: "YourIssuer",
-                        audience: "YourAudience",
+                        issuer: "http://localhost:3000/",
+                        audience: "http://localhost:3000/",
                         claims: claims,
                         expires: DateTime.UtcNow.AddHours(1), // Token expiration time
                         signingCredentials: creds

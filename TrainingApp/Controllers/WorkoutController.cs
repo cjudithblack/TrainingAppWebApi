@@ -34,7 +34,7 @@ namespace TrainingApp.Controllers
             {
                 return BadRequest("Invalid User");
             }
-            return Ok(await _dataBase.Workouts.Where(workout => workout.PlanId == planId).ToListAsync());
+            return Ok(await _dataBase.Workouts.Where(workout => workout.PlanId == planId).OrderBy(workout => workout.WorkoutId).ToListAsync());
         }
 
 
@@ -80,9 +80,10 @@ namespace TrainingApp.Controllers
             Plan? plan = await _dataBase.Plans.FindAsync(planId);
             if (plan == null)
                 return BadRequest(ModelState);
+            if (plan.Workouts.Count == 0) //when creating the first workout - it will be the next workout
+                plan.NextWorkoutId = workout.WorkoutId;
             await _dataBase.Workouts.AddAsync(workout);
             await _dataBase.SaveChangesAsync();
-
             return CreatedAtAction(nameof(GetWorkout), new { planId = planId, id = workout.WorkoutId }, workout);
         }
 
