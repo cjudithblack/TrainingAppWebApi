@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using NuGet.Common;
+using NuGet.Protocol;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using TrainingApp.Models;
 
 namespace TrainingApp.Controllers
@@ -47,14 +52,34 @@ namespace TrainingApp.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginModel model)
         {
+
             if (ModelState.IsValid)
             {
                 var user = _userManager.FindByEmailAsync(model.Email).Result;
                 var result = await _signInManager.PasswordSignInAsync(user?.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-
                 if (result.Succeeded)
                 {
-                    return Ok(new { message = "Login successful" });
+                    // Create claims for the user
+                    var claims = new[]
+                    {
+                        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    };
+
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSuperSecretKeyHere"));
+                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                    var token = new JwtSecurityToken(
+                        issuer: "YourIssuer",
+                        audience: "YourAudience",
+                        claims: claims,
+                        expires: DateTime.UtcNow.AddHours(1), // Token expiration time
+                        signingCredentials: creds
+                    );
+                    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+                    return Ok(new { message = "Login successful", token = tokenString });
+
                 }
                 else
                 {
@@ -66,7 +91,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("logout")]
-        [Authorize] 
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
