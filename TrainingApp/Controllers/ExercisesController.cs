@@ -33,7 +33,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{exerciseId}")]
         [Authorize]
-        [ProducesResponseType(typeof(Plan), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exercise), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExercise([FromRoute] int exerciseId)
         {

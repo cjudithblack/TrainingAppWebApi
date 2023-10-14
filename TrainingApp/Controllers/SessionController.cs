@@ -16,7 +16,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{workoutId}")]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<Session>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
@@ -25,7 +25,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{SessionId}")]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Session), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSession([FromRoute] int SessionId)
         {
@@ -37,6 +37,37 @@ namespace TrainingApp.Controllers
             return Ok(session.CompletedSets);
         }
 
+
+        [HttpGet("{SessionId}/currentExercise")]
+        [ProducesResponseType(typeof(Exercise), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCurrentExercise([FromRoute] int SessionId)
+        {
+            Session? session = await _dataBase.Sessions.FindAsync(SessionId);
+            if (session == null)
+                return NotFound("Invalid Session Number");
+            var exercise = await _dataBase.Exercises.FindAsync(session.CurrentExerciseId);
+            return exercise == null? NotFound() : Ok(exercise);
+        }
+
+
+        [HttpPatch("{sessionId}")]
+        public async Task<IActionResult> CompleteExercise([FromRoute] int sessionId)
+        {
+            Session session = await _dataBase.Sessions.FindAsync(sessionId);
+            int workoutId = session.WorkoutId;
+            List<int?> exerciseList = _dataBase.ExerciseInWorkouts.Where(e => e.WorkoutId == workoutId).Select(e => e.ExerciseId).OrderBy(e => e).ToList();
+            int currentExerciseIndex = exerciseList.IndexOf(session.CurrentExerciseId);
+            if (currentExerciseIndex == -1)
+                return BadRequest();
+            if (currentExerciseIndex == exerciseList.Count - 1)
+                session.Status = Status.Completed;
+            else
+                session.CurrentExerciseId = exerciseList[currentExerciseIndex + 1];
+            _dataBase.SaveChanges();
+            return Ok();
+        }
+
         [HttpPost("{WorkoutId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -46,7 +77,8 @@ namespace TrainingApp.Controllers
             Session session = new Session
             {
                 WorkoutId = WorkoutId,
-                Date = DateTime.UtcNow
+                Date = DateTime.UtcNow,
+                Status = Status.InProgress
             };
             Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
             if (workout == null)

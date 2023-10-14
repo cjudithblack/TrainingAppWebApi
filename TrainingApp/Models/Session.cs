@@ -4,6 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TrainingApp.Models
 {
+    public enum Status
+    {
+        InProgress,
+        Completed
+    }
     public class Session
     {
         public Session()
@@ -14,6 +19,8 @@ namespace TrainingApp.Models
         [Key]
         public int SessionId { get; set; }
         public System.DateTime Date { get; set; }
+        public Status Status { get; set; }
+        public int? CurrentExerciseId { get; set; }
         public int WorkoutId { get; set; }
         [ForeignKey("WorkoutId")]
         public virtual Workout Workout { get; set; }

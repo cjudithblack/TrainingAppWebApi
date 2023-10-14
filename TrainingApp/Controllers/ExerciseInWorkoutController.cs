@@ -17,7 +17,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{workoutId}")]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
             return Ok(_dataBase.ExerciseInWorkouts.Where(exercise => exercise.WorkoutId == workoutId).ToList());
@@ -25,7 +25,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{WorkoutId}/{ExerciseId}")]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ExerciseInWorkout), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExerciseInWorkout([FromRoute] int WorkoutId, [FromRoute] int ExerciseId)
         {

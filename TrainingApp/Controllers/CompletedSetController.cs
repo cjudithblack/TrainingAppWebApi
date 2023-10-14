@@ -16,7 +16,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{Id}")]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CompletedSet), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetCompletedSet([FromRoute] int Id)
         {
@@ -26,7 +26,7 @@ namespace TrainingApp.Controllers
 
         [HttpGet("{SessionId}")]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int SessionId)
         {

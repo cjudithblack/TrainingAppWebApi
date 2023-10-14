@@ -61,6 +61,20 @@ namespace TrainingApp.Controllers
             return Ok(workout);
         }
 
+        [HttpGet("Plans/{planId}/NextWorkout")]
+        [ProducesResponseType(typeof(Workout), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetNextWorkout([FromRoute] int planId)
+        {
+            Plan? plan = await _dataBase.Plans.FindAsync(planId);
+            if (plan == null)
+                return NotFound();
+            if (plan?.NextWorkoutId == null)
+                return NotFound("No workouts");
+            Workout? workout = await _dataBase.Workouts.FindAsync(plan.NextWorkoutId);
+            return workout == null ? NotFound() : Ok(workout);
+        }
+
         [HttpPost("/Plans/{planId}/CreateWorkout")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]

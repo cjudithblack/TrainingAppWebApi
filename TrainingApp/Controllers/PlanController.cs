@@ -43,6 +43,21 @@ namespace TrainingApp.Controllers
             Plan? plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId);
             return plan == null ? NotFound() : Ok(plan);
         }
+        
+        [HttpGet("currentPlan")]
+        [ProducesResponseType(typeof(Plan), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCurrentPlan()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User? user = await _dataBase.Users.FindAsync(userId);
+            if (user == null)
+                return BadRequest("User not found");
+            if (user.CurrentPlanId == null)
+                return NotFound("No plans");
+            Plan? plan = await _dataBase.Plans.FindAsync(user.CurrentPlanId);
+            return plan == null ? NotFound() : Ok(plan);
+        }
 
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
