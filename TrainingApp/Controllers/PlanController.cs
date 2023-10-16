@@ -75,10 +75,11 @@ namespace TrainingApp.Controllers
                 Description = newPlan.Description,
                 User = currentUser
             };
-            if (currentUser.Plans.Count == 0) //when creating the first plan - it will be the current plan
+            await _dataBase.Plans.AddAsync(plan);
+            await _dataBase.SaveChangesAsync();
+            if (currentUser.Plans.Count == 1) //when creating the first plan - it will be the current plan
                 currentUser.CurrentPlanId = plan.PlanId;
             //_dataBase.Users.Attach(plan.User);
-            await _dataBase.Plans.AddAsync(plan);
             await _dataBase.SaveChangesAsync();
             return CreatedAtAction(nameof(GetPlan), new { planId = plan.PlanId }, plan);
         }
