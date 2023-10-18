@@ -15,7 +15,7 @@ namespace TrainingApp.Controllers
         private readonly ApplicationDbContext _dataBase;
         public ExerciseInWorkoutController(ApplicationDbContext db) => _dataBase = db;
 
-        [HttpGet("{workoutId}")]
+        [HttpGet("{workoutId}", Name = "GetExerciseInWorkoutByWorkoutId")]
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
@@ -23,7 +23,7 @@ namespace TrainingApp.Controllers
             return Ok(_dataBase.ExerciseInWorkouts.Where(exercise => exercise.WorkoutId == workoutId).ToList());
         }
 
-        [HttpGet("{WorkoutId}/{ExerciseId}")]
+        [HttpGet("{WorkoutId}/{ExerciseId}", Name = "GetExerciseInWorkout")]
         [Authorize]
         [ProducesResponseType(typeof(ExerciseInWorkout), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -37,7 +37,7 @@ namespace TrainingApp.Controllers
             return Ok(exerciseInWorkout);
         }
 
-        [HttpPost("{WorkoutId}/{ExerciseId}")]
+        [HttpPost("{WorkoutId}/{ExerciseId}", Name = "CreateExerciseInWorkout")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
 
@@ -61,7 +61,7 @@ namespace TrainingApp.Controllers
             return CreatedAtAction(nameof(GetExerciseInWorkout), new { WorkoutId = WorkoutId, ExerciseId = ExerciseId }, exerciseInWorkout);
         }
 
-        [HttpPut("Update/{WorkoutId}/{ExerciseId}")]
+        [HttpPut("Update/{WorkoutId}/{ExerciseId}", Name = "UpdateExerciseInWorkout")]
         public async Task<IActionResult> UpdateExerciseInWorkout([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutUpdate updatedExerciseInWorkout)
         {
             ExerciseInWorkout? exerciseInWorkout = await _dataBase.ExerciseInWorkouts.FirstOrDefaultAsync(e => e.WorkoutId == WorkoutId && e.ExerciseId == ExerciseId);
@@ -77,7 +77,7 @@ namespace TrainingApp.Controllers
                 return NotFound();
         }
 
-        [HttpDelete("Delete/{WorkoutId}/{ExerciseId}")]
+        [HttpDelete("Delete/{WorkoutId}/{ExerciseId}", Name = "DeleteExerciseInWorkout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]

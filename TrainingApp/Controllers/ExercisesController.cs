@@ -17,7 +17,7 @@ namespace TrainingApp.Controllers
         public ExerciseController(ApplicationDbContext db) => _dataBase = db;
 
 
-        [HttpGet]
+        [HttpGet(Name = "GetUsersExercises")]
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Exercise>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -31,7 +31,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpGet("{exerciseId}")]
+        [HttpGet("{exerciseId}", Name = "GetExerciseById")]
         [Authorize]
         [ProducesResponseType(typeof(Exercise), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +42,7 @@ namespace TrainingApp.Controllers
             return exercise == null ? NotFound() : Ok(exercise);
         }
 
-        [HttpPost]
+        [HttpPost("CreateExercise")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
         {
@@ -60,7 +60,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpPut("UpdateExercise/{id}")]
+        [HttpPut("UpdateExercise/{id}", Name = "UpdateExercise")]
         public async Task<IActionResult> UpdateExercise([FromRoute] int id, [FromBody] ExerciseUpdate updatedExercise)
         {
             var exercise = await _dataBase.Exercises.FindAsync(id);
@@ -76,7 +76,7 @@ namespace TrainingApp.Controllers
                 return NotFound();
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpDelete("Delete/{id}", Name = "DeleteExercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]

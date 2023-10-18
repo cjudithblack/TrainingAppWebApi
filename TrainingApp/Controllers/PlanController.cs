@@ -24,7 +24,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpGet]
+        [HttpGet(Name = "GetUsersPlans")]
         [ProducesResponseType(typeof(IEnumerable<Plan>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get()
@@ -34,7 +34,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpGet("{planId}")]
+        [HttpGet("{planId}", Name = "GetPlanById")]
         [ProducesResponseType(typeof(Plan), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPlan([FromRoute] int planId)
@@ -44,7 +44,7 @@ namespace TrainingApp.Controllers
             return plan == null ? NotFound() : Ok(plan);
         }
         
-        [HttpGet("currentPlan")]
+        [HttpGet("currentPlan", Name = "GetCurrentPlan")]
         [ProducesResponseType(typeof(Plan), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCurrentPlan()
@@ -59,7 +59,7 @@ namespace TrainingApp.Controllers
             return plan == null ? NotFound() : Ok(plan);
         }
 
-        [HttpPost("Create")]
+        [HttpPost(Name = "CreatePlan")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] PlanAdd newPlan)
@@ -84,7 +84,7 @@ namespace TrainingApp.Controllers
             return CreatedAtAction(nameof(GetPlan), new { planId = plan.PlanId }, plan);
         }
 
-        [HttpPut("Update/{id}")]
+        [HttpPut("Update/{id}", Name = "UpdatePlan")]
         public async Task<IActionResult> UpdatePlan([FromRoute] int id, [FromBody] PlanUpdate updatedPlan)
         {
             var plan = await _dataBase.Plans.FindAsync(id);
@@ -99,7 +99,7 @@ namespace TrainingApp.Controllers
                 return NotFound();
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpDelete("Delete/{id}", Name = "DeletePlan")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -118,7 +118,7 @@ namespace TrainingApp.Controllers
             return NotFound();
         }
 
-        [HttpPatch("SetAsCurrent/{id}")]
+        [HttpPatch("SetAsCurrent/{id}", Name = "SetPlanAsCurrentById")]
         public async Task<IActionResult> SetAsCurrent([FromRoute] int id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

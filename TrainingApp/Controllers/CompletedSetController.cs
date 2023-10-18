@@ -14,7 +14,7 @@ namespace TrainingApp.Controllers
         private readonly ApplicationDbContext _dataBase;
         public CompletedSetController(ApplicationDbContext db) => _dataBase = db;
 
-        [HttpGet("{Id}")]
+        [HttpGet("{Id}", Name = "GetCompletedSetById")]
         [Authorize]
         [ProducesResponseType(typeof(CompletedSet), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -24,7 +24,7 @@ namespace TrainingApp.Controllers
             return completedSet == null ? NotFound() : Ok(completedSet);
         }
 
-        [HttpGet("{SessionId}")]
+        [HttpGet("{SessionId}", Name = "GetCompletedSetsBySessionId")]
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -34,7 +34,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost(Name = "CreateSet")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

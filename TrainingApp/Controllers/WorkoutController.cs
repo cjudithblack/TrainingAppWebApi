@@ -20,7 +20,7 @@ namespace TrainingApp.Controllers
         public WorkoutController(ApplicationDbContext db) => _dataBase = db;
 
 
-        [HttpGet("/Plans/{planId}/Workouts")]
+        [HttpGet("/Plans/{planId}/Workouts", Name = "GetWorkoutsByPlanId")]
         [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Workout>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -38,7 +38,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpGet("/Plans/{planId}/Workouts/{id}")]
+        [HttpGet("/Plans/{planId}/Workouts/{id}", Name = "GetWorkoutbyId")]
         [ProducesResponseType(typeof(Workout), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetWorkout([FromRoute] int planId, [FromRoute] int id)
