@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +11,14 @@ namespace TrainingApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
     public class ExerciseInWorkoutController : ControllerBase
     {
         private readonly ApplicationDbContext _dataBase;
         public ExerciseInWorkoutController(ApplicationDbContext db) => _dataBase = db;
 
         [HttpGet("{workoutId}", Name = "GetExerciseInWorkoutByWorkoutId")]
-        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
@@ -24,7 +26,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpGet("{WorkoutId}/{ExerciseId}", Name = "GetExerciseInWorkout")]
-        [Authorize]
         [ProducesResponseType(typeof(ExerciseInWorkout), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExerciseInWorkout([FromRoute] int WorkoutId, [FromRoute] int ExerciseId)
@@ -38,7 +39,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("{WorkoutId}/{ExerciseId}", Name = "CreateExerciseInWorkout")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
 
         public async Task<IActionResult> Create([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutAdd newExerciseInWorkout)
@@ -80,7 +80,6 @@ namespace TrainingApp.Controllers
         [HttpDelete("Delete/{WorkoutId}/{ExerciseId}", Name = "DeleteExerciseInWorkout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize]
         public async Task<IActionResult> DeletePlan([FromRoute] int WorkoutId, [FromRoute] int ExerciseId)
         {
             ExerciseInWorkout? exerciseInWorkout = await _dataBase.ExerciseInWorkouts.FirstOrDefaultAsync(e => e.WorkoutId == WorkoutId && e.ExerciseId == ExerciseId);

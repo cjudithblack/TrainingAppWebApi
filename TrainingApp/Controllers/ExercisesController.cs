@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace TrainingApp.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExerciseController : ControllerBase
     {
         private readonly ApplicationDbContext _dataBase;
@@ -18,7 +20,6 @@ namespace TrainingApp.Controllers
 
 
         [HttpGet(Name = "GetUsersExercises")]
-        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Exercise>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get()
@@ -32,7 +33,6 @@ namespace TrainingApp.Controllers
 
 
         [HttpGet("{exerciseId}", Name = "GetExerciseById")]
-        [Authorize]
         [ProducesResponseType(typeof(Exercise), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExercise([FromRoute] int exerciseId)
@@ -56,7 +56,7 @@ namespace TrainingApp.Controllers
             };
             await _dataBase.Exercises.AddAsync(exercise);
             await _dataBase.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetExercise), new { id = exercise.ExerciseId }, exercise);
+            return CreatedAtAction(nameof(GetExercise), new { exerciseId = exercise.ExerciseId }, exercise);
         }
 
 
@@ -66,9 +66,9 @@ namespace TrainingApp.Controllers
             var exercise = await _dataBase.Exercises.FindAsync(id);
             if (exercise != null)
             {
-                exercise.Name = updatedExercise.Name;
-                exercise.Description = updatedExercise.Description;
-                exercise.VideoUrl = updatedExercise.VideoUrl;
+                exercise.Name = (updatedExercise.Name == null) ? exercise.Name : updatedExercise.Name;
+                exercise.Description = (updatedExercise.Description == null) ? exercise.Description : updatedExercise.Description;
+                exercise.VideoUrl = (updatedExercise.VideoUrl == null) ? exercise.VideoUrl : updatedExercise.VideoUrl;
                 await _dataBase.SaveChangesAsync();
                 return Ok(exercise);
             }
@@ -79,7 +79,6 @@ namespace TrainingApp.Controllers
         [HttpDelete("Delete/{id}", Name = "DeleteExercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize]
         public async Task<IActionResult> DeleteExercise([FromRoute] int id)
         {
             var exercise = await _dataBase.Exercises.FindAsync(id);

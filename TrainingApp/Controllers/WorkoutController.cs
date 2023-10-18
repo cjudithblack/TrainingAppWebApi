@@ -8,11 +8,14 @@ using System.Security.Claims;
 using System.Numerics;
 using TrainingApp.Data.Migrations;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace TrainingApp.Controllers
 {
     //[Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
     public class WorkoutController : ControllerBase
     {
         private readonly ApplicationDbContext _dataBase;
@@ -21,7 +24,6 @@ namespace TrainingApp.Controllers
 
 
         [HttpGet("/Plans/{planId}/Workouts", Name = "GetWorkoutsByPlanId")]
-        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Workout>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get([FromRoute] int planId)
@@ -76,7 +78,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("/Plans/{planId}/CreateWorkout")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
         {
@@ -121,7 +122,6 @@ namespace TrainingApp.Controllers
         [HttpDelete("DeleteWorkout/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var workout = await _dataBase.Workouts.FindAsync(id);

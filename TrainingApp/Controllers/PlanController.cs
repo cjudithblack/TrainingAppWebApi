@@ -65,7 +65,7 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Create([FromBody] PlanAdd newPlan)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            User currentUser = _userManager.FindByIdAsync(userId).Result;
+            var currentUser = _userManager.Users.Include(u => u.Plans).FirstOrDefault(u => u.Id == userId);
             Plan? planNameExists = _dataBase.Plans.FirstOrDefaultAsync(plan => plan.UserId == userId && plan.Name == newPlan.Name).Result;
             if (planNameExists != null)
                 return BadRequest("You already have a plan with the same name");
@@ -124,6 +124,7 @@ namespace TrainingApp.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             User ? user = await _dataBase.Users.FindAsync(userId);
             user.CurrentPlanId = id;
+            await _dataBase.SaveChangesAsync();
             return Ok();
         }
 

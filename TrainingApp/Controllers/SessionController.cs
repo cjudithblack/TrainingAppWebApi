@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -9,13 +10,13 @@ namespace TrainingApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SessionController : ControllerBase
     {
         private readonly ApplicationDbContext _dataBase;
         public SessionController(ApplicationDbContext db) => _dataBase = db;
 
         [HttpGet("{workoutId}", Name = "GetSessionsByWorkoutId")]
-        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Session>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
@@ -24,7 +25,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpGet("{SessionId}", Name = "GetSessionById")]
-        [Authorize]
         [ProducesResponseType(typeof(Session), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSession([FromRoute] int SessionId)
@@ -69,7 +69,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
 
         public async Task<IActionResult> Create([FromRoute] int WorkoutId)
