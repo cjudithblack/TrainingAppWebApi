@@ -4,7 +4,8 @@ namespace TrainingApp.Models
 {
     public class UserRegistrationModel
     {
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress] 
@@ -13,9 +14,5 @@ namespace TrainingApp.Models
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Passwords don't match")]
-        public string ConfirmPassword { get; set; }
     }
 }

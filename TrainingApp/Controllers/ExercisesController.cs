@@ -66,9 +66,9 @@ namespace TrainingApp.Controllers
             var exercise = await _dataBase.Exercises.FindAsync(id);
             if (exercise != null)
             {
-                exercise.Name = (updatedExercise.Name == null) ? exercise.Name : updatedExercise.Name;
-                exercise.Description = (updatedExercise.Description == null) ? exercise.Description : updatedExercise.Description;
-                exercise.VideoUrl = (updatedExercise.VideoUrl == null) ? exercise.VideoUrl : updatedExercise.VideoUrl;
+                exercise.Name ??= updatedExercise.Name;
+                exercise.Description ??= updatedExercise.Description;
+                exercise.VideoUrl ??= updatedExercise.VideoUrl;
                 await _dataBase.SaveChangesAsync();
                 return Ok(exercise);
             }

@@ -38,6 +38,17 @@ namespace TrainingApp.Controllers
             return Ok(exerciseInWorkout);
         }
 
+        [HttpGet("{exerciseId}", Name = "GetRelatedWorkouts")]
+        [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRelatedWorkouts([FromRoute] int exerciseId)
+        {
+            List<ExerciseInWorkout> exerciseInWorkouts = await _dataBase.ExerciseInWorkouts.Where(e => e.ExerciseId == exerciseId).ToListAsync();
+            if (exerciseInWorkouts.Count == 0)
+                return NotFound();
+            return Ok(exerciseInWorkouts);
+        }
+
         [HttpPost("{WorkoutId}/{ExerciseId}", Name = "CreateExerciseInWorkout")]
         [ProducesResponseType(StatusCodes.Status201Created)]
 

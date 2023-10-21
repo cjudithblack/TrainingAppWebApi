@@ -40,22 +40,19 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpGet("/Plans/{planId}/Workouts/{id}", Name = "GetWorkoutbyId")]
+        [HttpGet("Workouts/{id}", Name = "GetWorkoutbyId")]
         [ProducesResponseType(typeof(Workout), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetWorkout([FromRoute] int planId, [FromRoute] int id)
+        public async Task<IActionResult> GetWorkout([FromRoute] int id)
         {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User? user = await _dataBase.Users.FindAsync(userId);
             var workout = await _dataBase.Workouts.FindAsync(id);
             if (workout == null)
             {
                 return NotFound();
             }
-            if (workout.PlanId != planId)
-            {
-                return BadRequest(ModelState);
-            }
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Plan? plan = await _dataBase.Plans.FindAsync(planId);
+            Plan? plan = await _dataBase.Plans.FirstOrDefaultAsync(p => p.PlanId == workout.PlanId);
             if (plan?.UserId != userId)
             {
                 return BadRequest();
@@ -110,8 +107,8 @@ namespace TrainingApp.Controllers
             var workout = await _dataBase.Workouts.FindAsync(id);
             if (workout != null)
             {
-                workout.Name = updatedWorkout.Name;
-                workout.Description = updatedWorkout.Description;
+                workout.Name ??= updatedWorkout.Name;
+                workout.Description ??= updatedWorkout.Description;
                 await _dataBase.SaveChangesAsync();
                 return Ok(workout);
             }

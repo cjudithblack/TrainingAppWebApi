@@ -32,7 +32,7 @@ namespace TrainingApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User(model.Name, model.Email);
+                var user = new User(model.FirstName, model.LastName, model.Email);
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -73,7 +73,7 @@ namespace TrainingApp.Controllers
                         issuer: "http://localhost:3000/",
                         audience: "http://localhost:3000/",
                         claims: claims,
-                        expires: DateTime.UtcNow.AddHours(1), // Token expiration time
+                        expires: DateTime.UtcNow.AddDays(200), //"never expires"
                         signingCredentials: creds
                     );
                     var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
@@ -88,6 +88,18 @@ namespace TrainingApp.Controllers
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpGet(Name = "GetCurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
         }
 
         [HttpPost("logout")]

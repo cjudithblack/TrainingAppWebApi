@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TrainingApp.Data;
 using TrainingApp.Models;
@@ -14,7 +16,12 @@ namespace TrainingApp.Controllers
     public class SessionController : ControllerBase
     {
         private readonly ApplicationDbContext _dataBase;
-        public SessionController(ApplicationDbContext db) => _dataBase = db;
+        private readonly UserManager<User> _userManager;
+        public SessionController(ApplicationDbContext db, UserManager<User> userManager)
+        {
+            _dataBase = db;
+            _userManager = userManager;
+        }
 
         [HttpGet("{workoutId}", Name = "GetSessionsByWorkoutId")]
         [ProducesResponseType(typeof(IEnumerable<Session>), StatusCodes.Status200OK)]
@@ -24,16 +31,38 @@ namespace TrainingApp.Controllers
             return Ok(_dataBase.Sessions.Where(session => session.WorkoutId == workoutId).ToList());
         }
 
+        [HttpGet(Name = "GetUsersSessions")]
+        [ProducesResponseType(typeof(IEnumerable<Session>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetUsersSessions()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.Users
+                .Include(u => u.Plans)
+                    .ThenInclude(p => p.Workouts)
+                        .ThenInclude(w => w.Sessions)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            var usersSessions = currentUser?.Plans
+                .SelectMany(plan => plan.Workouts.SelectMany(workout => workout.Sessions))
+                .ToList();
+
+            return Ok(usersSessions);
+        }
+
+
         [HttpGet("{SessionId}", Name = "GetSessionById")]
         [ProducesResponseType(typeof(Session), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSession([FromRoute] int SessionId)
         {
             Session? session = await _dataBase.Sessions.FindAsync(SessionId);
+
             if (session == null)
             {
                 return NotFound();
             }
+
             return Ok(session.CompletedSets);
         }
 
@@ -45,54 +74,91 @@ namespace TrainingApp.Controllers
         {
             Session? session = await _dataBase.Sessions.FindAsync(SessionId);
             if (session == null)
+            {
                 return NotFound("Invalid Session Number");
+            }
+
             var exercise = await _dataBase.Exercises.FindAsync(session.CurrentExerciseId);
-            return exercise == null? NotFound() : Ok(exercise);
+
+            return exercise == null ? NotFound() : Ok(exercise);
         }
 
 
         [HttpPatch("{sessionId}", Name = "UpdateSession")]
         public async Task<IActionResult> CompleteExercise([FromRoute] int sessionId)
         {
-            Session? session = await _dataBase.Sessions.FindAsync(sessionId);
-            int workoutId = session.WorkoutId;
-            List<int?> exerciseList = _dataBase.ExerciseInWorkouts.Where(e => e.WorkoutId == workoutId).Select(e => e.ExerciseId).OrderBy(e => e).ToList();
-            int currentExerciseIndex = exerciseList.IndexOf(session.CurrentExerciseId);
-            if (currentExerciseIndex == -1)
+            var session = await _dataBase.Sessions.FindAsync(sessionId);
+
+            if (session == null)
+            {
                 return BadRequest();
+            }
+
+            var exerciseList = _dataBase.ExerciseInWorkouts
+                .Where(e => e.WorkoutId == session.WorkoutId)
+                .OrderBy(e => e.ExerciseId)
+                .Select(e => e.ExerciseId)
+                .ToList();
+
+            var currentExerciseIndex = exerciseList.IndexOf(session.CurrentExerciseId);
+
+            if (currentExerciseIndex == -1)
+            {
+                return BadRequest();
+            }
+
             if (currentExerciseIndex == exerciseList.Count - 1)
+            {
                 session.Status = Status.Completed;
+            }
             else
+            {
                 session.CurrentExerciseId = exerciseList[currentExerciseIndex + 1];
-            _dataBase.SaveChanges();
+            }
+
+            await _dataBase.SaveChangesAsync();
+
             return Ok();
         }
 
+
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-
         public async Task<IActionResult> Create([FromRoute] int WorkoutId)
         {
-            Session session = new Session
+            var workout = await _dataBase.Workouts
+                .Include(w => w.Plan)
+                .ThenInclude(p => p.Workouts)
+                .FirstOrDefaultAsync(w => w.WorkoutId == WorkoutId);
+
+            if (workout == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var session = new Session
             {
                 WorkoutId = WorkoutId,
                 Date = DateTime.UtcNow,
-                Status = Status.InProgress
+                Status = Status.InProgress,
+                CurrentExerciseId = _dataBase.ExerciseInWorkouts
+                    .Where(e => e.WorkoutId == WorkoutId)
+                    .OrderBy(e => e.ExerciseId)
+                    .Select(e => e.ExerciseId)
+                    .FirstOrDefault()
             };
-            Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
-            if (workout == null)
-                return BadRequest(ModelState);
-            await _dataBase.Sessions.AddAsync(session);
-            await _dataBase.SaveChangesAsync();
-            List<int?> exerciseList = _dataBase.ExerciseInWorkouts.Where(e => e.WorkoutId == workout.WorkoutId).Select(e => e.ExerciseId).OrderBy(e => e).ToList();
-            session.CurrentExerciseId = exerciseList[0];
-            Plan? plan = workout.Plan;
-            var workoutList = plan.Workouts.OrderBy(workout => workout.WorkoutId).ToList();
+
+            _dataBase.Sessions.Add(session);
+
+            var workoutList = workout.Plan.Workouts.OrderBy(w => w.WorkoutId).ToList();
             var currentWorkoutIndex = workoutList.IndexOf(workout);
-            plan.NextWorkoutId = workoutList[(currentWorkoutIndex + 1) % workoutList.Count].WorkoutId;
+            workout.Plan.NextWorkoutId = workoutList[(currentWorkoutIndex + 1) % workoutList.Count].WorkoutId;
+
             await _dataBase.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetSession), new { SessionId = session.SessionId }, session);
         }
+
     }
 
 

@@ -11,13 +11,16 @@ namespace TrainingApp.Models
             this.Plans = new HashSet<Plan>();
             this.Exercises = new HashSet<Exercise>();
         }
-        public User(string name, string email)
+        public User(string firstName, string lastName, string email)
         {
-            this.UserName = name;
+            this.FirstName = firstName;
+            this.LastName = lastName;   
             this.Email = email;
             this.Plans = new HashSet<Plan>();
             this.Exercises = new HashSet<Exercise>();
         }
+        public string FirstName { get; set; }
+        public string LastName {  get; set; }
         public int CurrentPlanId { get; set; }
         public virtual ICollection<Plan> Plans { get; set; }
         public virtual ICollection<Exercise> Exercises { get; set; }
