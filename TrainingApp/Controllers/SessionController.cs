@@ -23,7 +23,7 @@ namespace TrainingApp.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("{workoutId}", Name = "GetSessionsByWorkoutId")]
+        [HttpGet("Workout/{workoutId}", Name = "GetSessionsByWorkoutId")]
         [ProducesResponseType(typeof(IEnumerable<Session>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
@@ -51,7 +51,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpGet("{SessionId}", Name = "GetSessionById")]
+        [HttpGet("Session/{SessionId}", Name = "GetSessionById")]
         [ProducesResponseType(typeof(Session), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSession([FromRoute] int SessionId)

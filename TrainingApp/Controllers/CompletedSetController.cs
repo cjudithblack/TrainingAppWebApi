@@ -17,7 +17,7 @@ namespace TrainingApp.Controllers
         private readonly ApplicationDbContext _dataBase;
         public CompletedSetController(ApplicationDbContext db) => _dataBase = db;
 
-        [HttpGet("{Id}", Name = "GetCompletedSetById")]
+        [HttpGet("Set/{Id}", Name = "GetCompletedSetById")]
         [ProducesResponseType(typeof(CompletedSet), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetCompletedSet([FromRoute] int Id)
@@ -26,12 +26,12 @@ namespace TrainingApp.Controllers
             return completedSet == null ? NotFound() : Ok(completedSet);
         }
 
-        [HttpGet("{SessionId}", Name = "GetCompletedSetsBySessionId")]
+        [HttpGet("Session/{Id}", Name = "GetCompletedSetsBySessionId")]
         [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Get([FromRoute] int SessionId)
+        public async Task<IActionResult> Get([FromRoute] int Id)
         {
-            return Ok(_dataBase.CompletedSets.Where(set => set.WorkoutSessionId == SessionId).ToListAsync());
+            return Ok(_dataBase.CompletedSets.Where(set => set.WorkoutSessionId == Id).ToListAsync());
         }
 
 

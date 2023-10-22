@@ -18,7 +18,7 @@ namespace TrainingApp.Controllers
         private readonly ApplicationDbContext _dataBase;
         public ExerciseInWorkoutController(ApplicationDbContext db) => _dataBase = db;
 
-        [HttpGet("{workoutId}", Name = "GetExerciseInWorkoutByWorkoutId")]
+        [HttpGet("Workout/{workoutId}", Name = "GetExerciseInWorkoutByWorkoutId")]
         [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
@@ -38,7 +38,7 @@ namespace TrainingApp.Controllers
             return Ok(exerciseInWorkout);
         }
 
-        [HttpGet("{exerciseId}", Name = "GetRelatedWorkouts")]
+        [HttpGet("Exercise/{exerciseId}", Name = "GetRelatedWorkouts")]
         [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRelatedWorkouts([FromRoute] int exerciseId)
