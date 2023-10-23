@@ -56,14 +56,14 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSession([FromRoute] int SessionId)
         {
-            Session? session = await _dataBase.Sessions.FindAsync(SessionId);
+            Session? session = await _dataBase.Sessions.Include(s => s.CompletedSets).FirstOrDefaultAsync(s => s.SessionId == SessionId);
 
             if (session == null)
             {
                 return NotFound();
             }
 
-            return Ok(session.CompletedSets);
+            return Ok(session);
         }
 
 
