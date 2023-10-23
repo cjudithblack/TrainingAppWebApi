@@ -43,7 +43,7 @@ namespace TrainingApp.Controllers
             Plan? plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId);
             return plan == null ? NotFound() : Ok(plan);
         }
-        
+
         [HttpGet("currentPlan", Name = "GetCurrentPlan")]
         [ProducesResponseType(typeof(Plan), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -107,22 +107,30 @@ namespace TrainingApp.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
-                return BadRequest("You need to sign in in order to delete a plan");
-            var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => id == plan.PlanId && userId == plan.UserId);
-            if (plan != null)
             {
-                _dataBase.Remove(plan);
-                _dataBase.SaveChanges();
-                return Ok();
+                return BadRequest("You need to sign in in order to delete a plan");
             }
-            return NotFound();
+            var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => id == plan.PlanId && userId == plan.UserId);
+            if (plan == null)
+            {
+                return NotFound();
+            }
+            _dataBase.Remove(plan);
+            _dataBase.SaveChanges();
+            var user = await _dataBase.Users.Include(u => u.Plans).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user?.CurrentPlanId == plan?.PlanId && user.Plans.Count != 0)
+            {
+                user.CurrentPlanId = user.Plans.ToList()[0].PlanId;
+            }
+            _dataBase.SaveChanges();
+            return Ok();
         }
 
         [HttpPatch("SetAsCurrent/{id}", Name = "SetPlanAsCurrentById")]
         public async Task<IActionResult> SetAsCurrent([FromRoute] int id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            User ? user = await _dataBase.Users.FindAsync(userId);
+            User? user = await _dataBase.Users.FindAsync(userId);
             user.CurrentPlanId = id;
             await _dataBase.SaveChangesAsync();
             return Ok();

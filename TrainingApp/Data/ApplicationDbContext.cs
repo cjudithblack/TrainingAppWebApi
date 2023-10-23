@@ -12,6 +12,7 @@ namespace TrainingApp.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
+
         }
         public DbSet<CompletedSet> CompletedSets { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
