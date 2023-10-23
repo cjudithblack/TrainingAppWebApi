@@ -42,7 +42,7 @@ namespace TrainingApp.Controllers
             return exercise == null ? NotFound() : Ok(exercise);
         }
 
-        [HttpPost("CreateExercise")]
+        [HttpPost("CreateExercise", Name = "CreateExercise")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
         {

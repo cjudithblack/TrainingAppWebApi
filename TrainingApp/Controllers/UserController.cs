@@ -27,7 +27,7 @@ namespace TrainingApp.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpPost("register")]
+        [HttpPost("register", Name = "Register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationModel model)
         {
             if (ModelState.IsValid)
@@ -49,7 +49,7 @@ namespace TrainingApp.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpPost("login")]
+        [HttpPost("login", Name = "Login")]
         public async Task<IActionResult> Login([FromBody] UserLoginModel model)
         {
 
@@ -102,7 +102,7 @@ namespace TrainingApp.Controllers
             return Ok(user);
         }
 
-        [HttpPost("logout")]
+        [HttpPost("logout", Name = "Logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {

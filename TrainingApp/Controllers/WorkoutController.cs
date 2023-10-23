@@ -60,7 +60,7 @@ namespace TrainingApp.Controllers
             return Ok(workout);
         }
 
-        [HttpGet("Plans/{planId}/NextWorkout")]
+        [HttpGet("Plans/{planId}/NextWorkout", Name = "GetNextWorkout")]
         [ProducesResponseType(typeof(Workout), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetNextWorkout([FromRoute] int planId)
@@ -74,7 +74,7 @@ namespace TrainingApp.Controllers
             return workout == null ? NotFound() : Ok(workout);
         }
 
-        [HttpPost("/Plans/{planId}/CreateWorkout")]
+        [HttpPost("/Plans/{planId}/CreateWorkout", Name = "CreateWorkout")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
         {
@@ -101,7 +101,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpPut("UpdateWorkout/{id}")]
+        [HttpPut("UpdateWorkout/{id}", Name = "UpdateWorkoutById")]
         public async Task<IActionResult> UpdateWorkout([FromRoute] int id, [FromBody] WorkoutUpdate updatedWorkout)
         {
             var workout = await _dataBase.Workouts.FindAsync(id);
@@ -116,7 +116,7 @@ namespace TrainingApp.Controllers
                 return NotFound();
         }
 
-        [HttpDelete("DeleteWorkout/{id}")]
+        [HttpDelete("DeleteWorkout/{id}", Name = "DeleteWorkoutById")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] int id)
