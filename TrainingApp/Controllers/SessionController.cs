@@ -84,7 +84,7 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpPatch("{sessionId}", Name = "UpdateSession")]
+        [HttpPatch("{sessionId}", Name = "CompleteExercise")]
         public async Task<IActionResult> CompleteExercise([FromRoute] int sessionId)
         {
             var session = await _dataBase.Sessions.FindAsync(sessionId);

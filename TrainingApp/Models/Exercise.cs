@@ -15,7 +15,7 @@ namespace TrainingApp.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string VideoUrl { get; set; }
-
+        public int? LastWeight { get; set; }
         public virtual ICollection<ExerciseInWorkout> ExerciseInWorkouts { get; set; }
         public virtual ICollection<CompletedSet> CompletedSets { get; set; }
 

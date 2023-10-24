@@ -31,7 +31,7 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int Id)
         {
-            return Ok(_dataBase.CompletedSets.Where(set => set.WorkoutSessionId == Id).ToListAsync());
+            return Ok(await _dataBase.CompletedSets.Where(set => set.WorkoutSessionId == Id).GroupBy(set => set.ExerciseId).ToListAsync());
         }
 
 
@@ -53,6 +53,7 @@ namespace TrainingApp.Controllers
             Exercise? exercise = await _dataBase.Exercises.FindAsync(newCompletedSet.ExerciseId);
             if (session == null || exercise == null)
                 return BadRequest();
+            exercise.LastWeight = newCompletedSet.Weight;
             await _dataBase.CompletedSets.AddAsync(set);
             await _dataBase.SaveChangesAsync();
             return CreatedAtAction(nameof(GetCompletedSet), new { Id = set.SetId }, set);
