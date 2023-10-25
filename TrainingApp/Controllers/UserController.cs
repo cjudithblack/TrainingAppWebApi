@@ -103,7 +103,6 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("logout", Name = "Logout")]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

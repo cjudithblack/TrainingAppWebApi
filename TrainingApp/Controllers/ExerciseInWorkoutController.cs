@@ -22,7 +22,11 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(typeof(IEnumerable<ExerciseInWorkout>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
-            return Ok(_dataBase.ExerciseInWorkouts.Where(exercise => exercise.WorkoutId == workoutId).ToList());
+            return Ok(await _dataBase.ExerciseInWorkouts
+                .Include(eiw => eiw.Exercise)
+                .Include(eiw => eiw.Workout)
+                .Where(exercise => exercise.WorkoutId == workoutId)
+                .ToListAsync());
         }
 
         [HttpGet("{WorkoutId}/{ExerciseId}", Name = "GetExerciseInWorkout")]
@@ -30,7 +34,10 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExerciseInWorkout([FromRoute] int WorkoutId, [FromRoute] int ExerciseId)
         {
-            ExerciseInWorkout? exerciseInWorkout = await _dataBase.ExerciseInWorkouts.FirstOrDefaultAsync(e => e.WorkoutId == WorkoutId && e.ExerciseId == ExerciseId);
+            ExerciseInWorkout? exerciseInWorkout = await _dataBase.ExerciseInWorkouts
+                .Include(eiw => eiw.Exercise)
+                .Include(eiw => eiw.Workout)
+                .FirstOrDefaultAsync(eiw => eiw.WorkoutId == WorkoutId && eiw.ExerciseId == ExerciseId);
             if (exerciseInWorkout == null)
             {
                 return NotFound();
@@ -43,7 +50,12 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRelatedWorkouts([FromRoute] int exerciseId)
         {
-            List<ExerciseInWorkout> exerciseInWorkouts = await _dataBase.ExerciseInWorkouts.Where(e => e.ExerciseId == exerciseId).ToListAsync();
+            List<ExerciseInWorkout> exerciseInWorkouts = 
+                await _dataBase.ExerciseInWorkouts
+                .Include(eiw => eiw.Exercise)
+                .Include(eiw => eiw.Workout)
+                .Where(eiw => eiw.ExerciseId == exerciseId)
+                .ToListAsync();
             if (exerciseInWorkouts.Count == 0)
                 return NotFound();
             return Ok(exerciseInWorkouts);

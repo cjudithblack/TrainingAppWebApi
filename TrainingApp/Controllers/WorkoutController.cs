@@ -36,7 +36,11 @@ namespace TrainingApp.Controllers
             {
                 return BadRequest("Invalid User");
             }
-            return Ok(await _dataBase.Workouts.Where(workout => workout.PlanId == planId).OrderBy(workout => workout.WorkoutId).ToListAsync());
+            return Ok(await _dataBase.Workouts
+                .Include(w => w.Plan)
+                .Where(workout => workout.PlanId == planId)
+                .OrderBy(workout => workout.WorkoutId)
+                .ToListAsync());
         }
 
 
@@ -47,7 +51,9 @@ namespace TrainingApp.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             User? user = await _dataBase.Users.FindAsync(userId);
-            var workout = await _dataBase.Workouts.FindAsync(id);
+            var workout = await _dataBase.Workouts
+                .Include(w => w.Plan)
+                .FirstOrDefaultAsync(w => w.WorkoutId == id);
             if (workout == null)
             {
                 return NotFound();
@@ -70,7 +76,9 @@ namespace TrainingApp.Controllers
                 return NotFound();
             if (plan?.NextWorkoutId == null)
                 return NotFound("No workouts");
-            Workout? workout = await _dataBase.Workouts.FindAsync(plan.NextWorkoutId);
+            Workout? workout = await _dataBase.Workouts
+                .Include(w => w.Plan)
+                .FirstOrDefaultAsync(w => w.WorkoutId == plan.NextWorkoutId);
             return workout == null ? NotFound() : Ok(workout);
         }
 
@@ -82,13 +90,16 @@ namespace TrainingApp.Controllers
             string? plansUser = _dataBase.Plans.Find(planId)?.UserId;
             if (plansUser != userId)
                 return NotFound();
-            Workout? workoutNameExists = _dataBase.Workouts.FirstOrDefaultAsync(workout => workout.PlanId == planId && workout.Name == newWorkout.Name).Result;
+            Workout? workoutNameExists = _dataBase.Workouts
+                .FirstOrDefaultAsync(workout => workout.PlanId == planId && workout.Name == newWorkout.Name).Result;
             if (workoutNameExists != null)
                 return BadRequest("You already have a workout with the same name");
-            Workout workout = new Workout {
+            Workout workout = new Workout
+            {
                 Name = newWorkout.Name,
                 Description = newWorkout.Description,
-                PlanId = planId };
+                PlanId = planId
+            };
             Plan? plan = await _dataBase.Plans.FindAsync(planId);
             if (plan == null)
                 return BadRequest(ModelState);

@@ -22,7 +22,10 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetCompletedSet([FromRoute] int Id)
         {
-            CompletedSet? completedSet = await _dataBase.CompletedSets.FindAsync(Id);
+            CompletedSet? completedSet = await _dataBase.CompletedSets
+                .Include(s => s.Exercise)
+                .Include(s => s.ParentWorkoutSession)
+                .FirstOrDefaultAsync(s => s.SetId == Id);
             return completedSet == null ? NotFound() : Ok(completedSet);
         }
 
@@ -31,7 +34,13 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int Id)
         {
-            return Ok(await _dataBase.CompletedSets.Where(set => set.WorkoutSessionId == Id).GroupBy(set => set.ExerciseId).ToListAsync());
+            return Ok(
+                await _dataBase.CompletedSets
+                .Where(set => set.WorkoutSessionId == Id)
+                .Include(s => s.Exercise)
+                .Include(s => s.ParentWorkoutSession)
+                .GroupBy(set => set.ExerciseId)
+                .ToListAsync());
         }
 
 

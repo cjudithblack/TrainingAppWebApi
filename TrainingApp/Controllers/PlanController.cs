@@ -30,7 +30,10 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Get()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Ok(await _dataBase.Plans.Where(plan => plan.UserId == userId).ToListAsync());
+            return Ok(await _dataBase.Plans
+                .Include(p => p.User)
+                .Where(p => p.UserId == userId)
+                .ToListAsync());
         }
 
 
@@ -40,7 +43,9 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> GetPlan([FromRoute] int planId)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Plan? plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => plan.PlanId == planId && plan.UserId == userId);
+            Plan? plan = await _dataBase.Plans
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.PlanId == planId && p.UserId == userId);
             return plan == null ? NotFound() : Ok(plan);
         }
 

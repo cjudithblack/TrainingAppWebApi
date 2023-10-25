@@ -22,5 +22,21 @@ namespace TrainingApp.Data
         public DbSet<Workout> Workouts { get; set; }
 
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CompletedSet>()
+                .HasOne(p => p.Exercise)
+                .WithMany(b => b.CompletedSets)
+                .HasForeignKey(p => p.ExerciseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Session>()
+                .HasOne(p => p.Workout)
+                .WithMany(b => b.Sessions)
+                .HasForeignKey(p => p.WorkoutId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

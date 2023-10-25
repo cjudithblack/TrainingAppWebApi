@@ -25,7 +25,10 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Get()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Exercise> exercises = await _dataBase.Exercises.Where(exercise => exercise.UserId == userId).ToListAsync();
+            List<Exercise> exercises = await _dataBase.Exercises
+                .Where(exercise => exercise.UserId == userId)
+                .Include(e => e.User)
+                .ToListAsync();
             if (exercises.Count == 0)
                 return NotFound();
             return Ok(exercises);
@@ -38,7 +41,9 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> GetExercise([FromRoute] int exerciseId)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var exercise = await _dataBase.Exercises.FirstOrDefaultAsync(exercise => exercise.ExerciseId == exerciseId && exercise.UserId == userId);
+            var exercise = await _dataBase.Exercises
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(exercise => exercise.ExerciseId == exerciseId && exercise.UserId == userId);
             return exercise == null ? NotFound() : Ok(exercise);
         }
 

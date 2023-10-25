@@ -28,7 +28,10 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
-            return Ok(_dataBase.Sessions.Where(session => session.WorkoutId == workoutId).ToList());
+            return Ok(await _dataBase.Sessions
+                .Include(s => s.Workout)
+                .Where(s => s.WorkoutId == workoutId)
+                .ToListAsync());
         }
 
         [HttpGet(Name = "GetUsersSessions")]
@@ -41,6 +44,7 @@ namespace TrainingApp.Controllers
                 .Include(u => u.Plans)
                     .ThenInclude(p => p.Workouts)
                         .ThenInclude(w => w.Sessions)
+                        .ThenInclude(s => s.Workout)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             var usersSessions = currentUser?.Plans
@@ -56,7 +60,10 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSession([FromRoute] int SessionId)
         {
-            Session? session = await _dataBase.Sessions.Include(s => s.CompletedSets).FirstOrDefaultAsync(s => s.SessionId == SessionId);
+            Session? session = await _dataBase.Sessions
+                .Include(s => s.CompletedSets)
+                .Include(s => s.Workout)
+                .FirstOrDefaultAsync(s => s.SessionId == SessionId);
 
             if (session == null)
             {
@@ -78,7 +85,9 @@ namespace TrainingApp.Controllers
                 return NotFound("Invalid Session Number");
             }
 
-            var exercise = await _dataBase.Exercises.FindAsync(session.CurrentExerciseId);
+            var exercise = await _dataBase.Exercises
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(e => e.ExerciseId == session.CurrentExerciseId);
 
             return exercise == null ? NotFound() : Ok(exercise);
         }
