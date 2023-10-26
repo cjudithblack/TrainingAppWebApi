@@ -52,6 +52,9 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Exercise? exerciseNameExists = _dataBase.Exercises.FirstOrDefaultAsync(e => e.UserId == userId && e.Name == newExercise.Name).Result;
+            if (exerciseNameExists != null)
+                return BadRequest("You already have an exercise with the same name");
             Exercise exercise = new Exercise
             {
                 Name = newExercise.Name,
