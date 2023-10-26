@@ -15,7 +15,7 @@ namespace TrainingApp.Models
         {
             this.FirstName = firstName;
             this.LastName = lastName;   
-            this.UserName = firstName + lastName;
+            this.UserName = firstName + " " + lastName;
             this.Email = email;
             this.Plans = new HashSet<Plan>();
             this.Exercises = new HashSet<Exercise>();
