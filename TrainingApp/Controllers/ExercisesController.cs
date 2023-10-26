@@ -48,7 +48,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("CreateExercise", Name = "CreateExercise")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -61,7 +61,7 @@ namespace TrainingApp.Controllers
             };
             await _dataBase.Exercises.AddAsync(exercise);
             await _dataBase.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetExercise), new { exerciseId = exercise.ExerciseId }, exercise);
+            return Ok(exercise);
         }
 
 

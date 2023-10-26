@@ -83,7 +83,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("/Plans/{planId}/CreateWorkout", Name = "CreateWorkout")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -108,7 +108,7 @@ namespace TrainingApp.Controllers
             if (plan.Workouts.Count == 1) //when creating the first workout - it will be the next workout
                 plan.NextWorkoutId = workout.WorkoutId;
             await _dataBase.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetWorkout), new { planId = planId, id = workout.WorkoutId }, workout);
+            return Ok(workout);
         }
 
 

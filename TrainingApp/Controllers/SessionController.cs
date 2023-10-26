@@ -132,7 +132,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromRoute] int WorkoutId)
         {
             var workout = await _dataBase.Workouts
@@ -165,7 +165,7 @@ namespace TrainingApp.Controllers
 
             await _dataBase.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetSession), new { SessionId = session.SessionId }, session);
+            return Ok(session);
         }
 
     }

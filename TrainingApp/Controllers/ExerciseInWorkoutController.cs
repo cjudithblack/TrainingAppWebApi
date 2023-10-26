@@ -62,7 +62,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("{WorkoutId}/{ExerciseId}", Name = "CreateExerciseInWorkout")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
 
         public async Task<IActionResult> Create([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutAdd newExerciseInWorkout)
         {
@@ -81,7 +81,7 @@ namespace TrainingApp.Controllers
             await _dataBase.ExerciseInWorkouts.AddAsync(exerciseInWorkout);
             await _dataBase.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetExerciseInWorkout), new { WorkoutId = WorkoutId, ExerciseId = ExerciseId }, exerciseInWorkout);
+            return Ok(exerciseInWorkout);
         }
 
         [HttpPut("Update/{WorkoutId}/{ExerciseId}", Name = "UpdateExerciseInWorkout")]

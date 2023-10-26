@@ -65,7 +65,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost(Name = "CreatePlan")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] PlanAdd newPlan)
         {
@@ -86,7 +86,7 @@ namespace TrainingApp.Controllers
                 currentUser.CurrentPlanId = plan.PlanId;
             //_dataBase.Users.Attach(plan.User);
             await _dataBase.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetPlan), new { planId = plan.PlanId }, plan);
+            return Ok(plan);
         }
 
         [HttpPut("Update/{id}", Name = "UpdatePlan")]

@@ -45,7 +45,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPost(Name = "CreateSet")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CompletedSetAdd newCompletedSet)
         {
@@ -65,7 +65,7 @@ namespace TrainingApp.Controllers
             exercise.LastWeight = newCompletedSet.Weight;
             await _dataBase.CompletedSets.AddAsync(set);
             await _dataBase.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCompletedSet), new { Id = set.SetId }, set);
+            return Ok(set);
         }
     }
 
