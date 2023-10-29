@@ -37,15 +37,13 @@ namespace TrainingApp.Controllers
             return Ok(
                 await _dataBase.CompletedSets
                 .Where(set => set.WorkoutSessionId == Id)
-                .Include(s => s.Exercise)
-                .Include(s => s.ParentWorkoutSession)
                 .GroupBy(set => set.ExerciseId)
                 .ToListAsync());
         }
 
 
         [HttpPost(Name = "CreateSet")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CompletedSetAdd newCompletedSet)
         {
@@ -65,7 +63,7 @@ namespace TrainingApp.Controllers
             exercise.LastWeight = newCompletedSet.Weight;
             await _dataBase.CompletedSets.AddAsync(set);
             await _dataBase.SaveChangesAsync();
-            return Ok(set);
+            return CreatedAtAction("GetCompletedSet", new { Id = set.SetId }, set);
         }
     }
 

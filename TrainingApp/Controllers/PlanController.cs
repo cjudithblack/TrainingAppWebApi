@@ -31,7 +31,6 @@ namespace TrainingApp.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Ok(await _dataBase.Plans
-                .Include(p => p.User)
                 .Where(p => p.UserId == userId)
                 .ToListAsync());
         }
@@ -65,7 +64,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost(Name = "CreatePlan")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] PlanAdd newPlan)
         {
@@ -86,7 +85,7 @@ namespace TrainingApp.Controllers
                 currentUser.CurrentPlanId = plan.PlanId;
             //_dataBase.Users.Attach(plan.User);
             await _dataBase.SaveChangesAsync();
-            return Ok(plan);
+            return CreatedAtAction("GetPlan", new { planId = plan.PlanId }, plan);
         }
 
         [HttpPut("Update/{id}", Name = "UpdatePlan")]

@@ -23,8 +23,6 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
             return Ok(await _dataBase.ExerciseInWorkouts
-                .Include(eiw => eiw.Exercise)
-                .Include(eiw => eiw.Workout)
                 .Where(exercise => exercise.WorkoutId == workoutId)
                 .ToListAsync());
         }
@@ -52,8 +50,6 @@ namespace TrainingApp.Controllers
         {
             List<ExerciseInWorkout> exerciseInWorkouts = 
                 await _dataBase.ExerciseInWorkouts
-                .Include(eiw => eiw.Exercise)
-                .Include(eiw => eiw.Workout)
                 .Where(eiw => eiw.ExerciseId == exerciseId)
                 .ToListAsync();
             if (exerciseInWorkouts.Count == 0)
@@ -62,7 +58,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("{WorkoutId}/{ExerciseId}", Name = "CreateExerciseInWorkout")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
 
         public async Task<IActionResult> Create([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutAdd newExerciseInWorkout)
         {
@@ -81,7 +77,7 @@ namespace TrainingApp.Controllers
             await _dataBase.ExerciseInWorkouts.AddAsync(exerciseInWorkout);
             await _dataBase.SaveChangesAsync();
 
-            return Ok(exerciseInWorkout);
+            return CreatedAtAction("GetExerciseInWorkout", new { WorkoutId = WorkoutId, ExerciseId = ExerciseId }, exerciseInWorkout);
         }
 
         [HttpPut("Update/{WorkoutId}/{ExerciseId}", Name = "UpdateExerciseInWorkout")]
@@ -103,7 +99,7 @@ namespace TrainingApp.Controllers
         [HttpDelete("Delete/{WorkoutId}/{ExerciseId}", Name = "DeleteExerciseInWorkout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeletePlan([FromRoute] int WorkoutId, [FromRoute] int ExerciseId)
+        public async Task<IActionResult> DeleteExerciseInWorkout([FromRoute] int WorkoutId, [FromRoute] int ExerciseId)
         {
             ExerciseInWorkout? exerciseInWorkout = await _dataBase.ExerciseInWorkouts.FirstOrDefaultAsync(e => e.WorkoutId == WorkoutId && e.ExerciseId == ExerciseId);
             if (exerciseInWorkout != null)

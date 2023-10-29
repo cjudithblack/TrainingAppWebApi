@@ -29,7 +29,6 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
             return Ok(await _dataBase.Sessions
-                .Include(s => s.Workout)
                 .Where(s => s.WorkoutId == workoutId)
                 .ToListAsync());
         }
@@ -132,7 +131,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromRoute] int WorkoutId)
         {
             var workout = await _dataBase.Workouts
@@ -165,7 +164,7 @@ namespace TrainingApp.Controllers
 
             await _dataBase.SaveChangesAsync();
 
-            return Ok(session);
+            return CreatedAtAction("GetSession", new { SessionId = session.SessionId }, session);
         }
 
     }

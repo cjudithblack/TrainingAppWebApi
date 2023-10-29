@@ -27,7 +27,6 @@ namespace TrainingApp.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<Exercise> exercises = await _dataBase.Exercises
                 .Where(exercise => exercise.UserId == userId)
-                .Include(e => e.User)
                 .ToListAsync();
             if (exercises.Count == 0)
                 return NotFound();
@@ -48,7 +47,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("CreateExercise", Name = "CreateExercise")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -64,7 +63,7 @@ namespace TrainingApp.Controllers
             };
             await _dataBase.Exercises.AddAsync(exercise);
             await _dataBase.SaveChangesAsync();
-            return Ok(exercise);
+            return CreatedAtAction("GetExercise", new { exerciseId = exercise.ExerciseId }, exercise);
         }
 
 
