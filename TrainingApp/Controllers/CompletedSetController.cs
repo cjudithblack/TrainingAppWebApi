@@ -43,7 +43,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPost(Name = "CreateSet")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(CompletedSet), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CompletedSetAdd newCompletedSet)
         {

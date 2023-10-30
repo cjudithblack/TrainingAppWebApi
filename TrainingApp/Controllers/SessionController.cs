@@ -130,7 +130,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Session), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromRoute] int WorkoutId)
         {
             var workout = await _dataBase.Workouts

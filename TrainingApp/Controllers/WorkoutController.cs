@@ -83,7 +83,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("/Plans/{planId}/CreateWorkout", Name = "CreateWorkout")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Workout), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

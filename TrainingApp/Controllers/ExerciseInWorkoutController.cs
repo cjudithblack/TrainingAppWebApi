@@ -58,8 +58,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPost("{WorkoutId}/{ExerciseId}", Name = "CreateExerciseInWorkout")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-
+        [ProducesResponseType(typeof(ExerciseInWorkout), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutAdd newExerciseInWorkout)
         {
             ExerciseInWorkout exerciseInWorkout = new ExerciseInWorkout { 
