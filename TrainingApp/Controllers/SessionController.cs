@@ -43,7 +43,6 @@ namespace TrainingApp.Controllers
                 .Include(u => u.Plans)
                     .ThenInclude(p => p.Workouts)
                         .ThenInclude(w => w.Sessions)
-                        .ThenInclude(s => s.Workout)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             var usersSessions = currentUser?.Plans
