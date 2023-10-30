@@ -94,8 +94,8 @@ namespace TrainingApp.Controllers
             var plan = await _dataBase.Plans.FindAsync(id);
             if (plan != null)
             {
-                plan.Name ??= updatedPlan.Name;
-                plan.Description ??= updatedPlan.Description;
+                plan.Name = updatedPlan.Name;
+                plan.Description = updatedPlan.Description;
                 await _dataBase.SaveChangesAsync();
                 return Ok(plan);
             }

@@ -119,8 +119,8 @@ namespace TrainingApp.Controllers
             var workout = await _dataBase.Workouts.FindAsync(id);
             if (workout != null)
             {
-                workout.Name ??= updatedWorkout.Name;
-                workout.Description ??= updatedWorkout.Description;
+                workout.Name = updatedWorkout.Name;
+                workout.Description = updatedWorkout.Description;
                 await _dataBase.SaveChangesAsync();
                 return Ok(workout);
             }
