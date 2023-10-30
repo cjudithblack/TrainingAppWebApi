@@ -23,6 +23,8 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Get([FromRoute] int workoutId)
         {
             return Ok(await _dataBase.ExerciseInWorkouts
+                .Include(eiw => eiw.Exercise)
+                .Include(eiw => eiw.Workout)
                 .Where(exercise => exercise.WorkoutId == workoutId)
                 .ToListAsync());
         }
