@@ -34,11 +34,17 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int Id)
         {
-            return Ok(
-                await _dataBase.CompletedSets
+            var groupedSets = await _dataBase.CompletedSets
                 .Where(set => set.WorkoutSessionId == Id)
                 .GroupBy(set => set.ExerciseId)
-                .ToListAsync());
+                .Select(group => new
+                {
+                    ExerciseId = group.Key,
+                    Sets = group.ToList()
+                })
+                .ToListAsync();
+
+            return Ok(groupedSets);
         }
 
 
