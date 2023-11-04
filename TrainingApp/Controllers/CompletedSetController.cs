@@ -30,7 +30,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpGet("Session/{Id}", Name = "GetCompletedSetsBySessionId")]
-        [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof((int, IEnumerable<CompletedSet>)), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int Id)
         {
