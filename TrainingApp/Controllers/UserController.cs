@@ -93,6 +93,8 @@ namespace TrainingApp.Controllers
 
         [HttpGet(Name = "GetCurrentUser")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCurrentUser()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
