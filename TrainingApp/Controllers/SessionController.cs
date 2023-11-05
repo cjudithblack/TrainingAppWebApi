@@ -95,6 +95,8 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> CompleteExercise([FromRoute] int sessionId)
         {
             var session = await _dataBase.Sessions.FindAsync(sessionId);
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (session == null)
             {
@@ -114,9 +116,16 @@ namespace TrainingApp.Controllers
                 return BadRequest();
             }
 
+            if(currentExerciseIndex == 0)
+            {
+                session.Status = Status.InProgress;
+                currentUser.CurrentSessionId = sessionId;
+            }
+
             if (currentExerciseIndex == exerciseList.Count - 1)
             {
                 session.Status = Status.Completed;
+                currentUser.CurrentSessionId = 0;
             }
             else
             {
@@ -126,8 +135,7 @@ namespace TrainingApp.Controllers
             await _dataBase.SaveChangesAsync();
 
             return Ok();
-        }
-
+        }        
 
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
         [ProducesResponseType(typeof(Session), StatusCodes.Status201Created)]

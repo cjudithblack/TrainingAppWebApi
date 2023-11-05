@@ -23,6 +23,7 @@ namespace TrainingApp.Models
         public string FirstName { get; set; }
         public string LastName {  get; set; }
         public int CurrentPlanId { get; set; }
+        public int CurrentSessionId { get; set; }
         public virtual ICollection<Plan> Plans { get; set; }
         public virtual ICollection<Exercise> Exercises { get; set; }
     }
