@@ -2,7 +2,7 @@
 {
     public class GroupedSetResponse
     {
-        public int ExerciseId { get; set; }
+        public Exercise Exercise { get; set; }
         public List<CompletedSet> Sets { get; set; }
     }
 }

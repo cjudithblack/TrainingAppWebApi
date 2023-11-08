@@ -30,7 +30,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpGet("Session/{Id}", Name = "GetCompletedSetsBySessionId")]
-        [ProducesResponseType(typeof(GroupedSetResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<GroupedSetResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get([FromRoute] int Id)
         {
@@ -39,7 +39,7 @@ namespace TrainingApp.Controllers
                 .GroupBy(set => set.ExerciseId)
                 .Select(group => new
                 {
-                    ExerciseId = group.Key,
+                    Exercise = _dataBase.Exercises.Find(group.Key),
                     Sets = group.ToList()
                 })
                 .ToListAsync();
