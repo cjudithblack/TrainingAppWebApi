@@ -37,9 +37,9 @@ namespace TrainingApp.Controllers
             var groupedSets = await _dataBase.CompletedSets
                 .Where(set => set.WorkoutSessionId == Id)
                 .GroupBy(set => set.ExerciseId)
-                .Select(group => new
+                .Select(group => new GroupedSetResponse
                 {
-                    Exercise = _dataBase.Exercises.Find(group.Key),
+                    Exercise = _dataBase.Exercises.FirstOrDefault(exercise => exercise.ExerciseId == group.Key),
                     Sets = group.ToList()
                 })
                 .ToListAsync();
