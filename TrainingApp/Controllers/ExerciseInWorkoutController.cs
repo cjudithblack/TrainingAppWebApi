@@ -97,6 +97,34 @@ namespace TrainingApp.Controllers
                 return NotFound();
         }
 
+        [HttpPut("Update/{WorkoutId}", Name = "UpdateAllExercisesInWorkout")]
+        public async Task<IActionResult> UpdateAllExercisesInWorkout([FromRoute] int WorkoutId, [FromBody] IEnumerable<(int exerciseId, ExerciseInWorkoutAdd)> ExerciseInWorkoutList)
+        {
+            var currentExerciseList = await _dataBase.ExerciseInWorkouts.Where(eiw => eiw.WorkoutId == WorkoutId).ToListAsync();
+            foreach (var exercise in currentExerciseList)
+            {
+                _dataBase.Remove(exercise);
+            }
+            foreach (var eiw in ExerciseInWorkoutList)
+            {
+                ExerciseInWorkout exerciseInWorkout = new ExerciseInWorkout
+                {
+                    WorkoutId = WorkoutId,
+                    ExerciseId = eiw.exerciseId,
+                    NumOfReps = eiw.Item2.NumOfReps,
+                    NumOfSets = eiw.Item2.NumOfSets,
+                    RestTime = eiw.Item2.RestTime
+                };
+                Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
+                Exercise? exercise = await _dataBase.Exercises.FindAsync(eiw.exerciseId);
+                if (workout == null || exercise == null)
+                    return BadRequest(ModelState);
+                await _dataBase.ExerciseInWorkouts.AddAsync(exerciseInWorkout);
+                await _dataBase.SaveChangesAsync();
+            }
+            return Ok();
+        }
+
         [HttpDelete("Delete/{WorkoutId}/{ExerciseId}", Name = "DeleteExerciseInWorkout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
