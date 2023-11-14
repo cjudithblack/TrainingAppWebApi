@@ -98,7 +98,7 @@ namespace TrainingApp.Controllers
         }
 
         [HttpPut("Update/{WorkoutId}", Name = "UpdateAllExercisesInWorkout")]
-        public async Task<IActionResult> UpdateAllExercisesInWorkout([FromRoute] int WorkoutId, [FromBody] IEnumerable<(int exerciseId, ExerciseInWorkoutAdd)> ExerciseInWorkoutList)
+        public async Task<IActionResult> UpdateAllExercisesInWorkout([FromRoute] int WorkoutId, [FromBody] IEnumerable<ExerciseInWorkoutWithId> ExerciseInWorkoutList)
         {
             var currentExerciseList = await _dataBase.ExerciseInWorkouts.Where(eiw => eiw.WorkoutId == WorkoutId).ToListAsync();
             foreach (var exercise in currentExerciseList)
@@ -111,9 +111,9 @@ namespace TrainingApp.Controllers
                 {
                     WorkoutId = WorkoutId,
                     ExerciseId = eiw.exerciseId,
-                    NumOfReps = eiw.Item2.NumOfReps,
-                    NumOfSets = eiw.Item2.NumOfSets,
-                    RestTime = eiw.Item2.RestTime
+                    NumOfReps = eiw.NumOfReps,
+                    NumOfSets = eiw.NumOfSets,
+                    RestTime = eiw.RestTime
                 };
                 Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
                 Exercise? exercise = await _dataBase.Exercises.FindAsync(eiw.exerciseId);
