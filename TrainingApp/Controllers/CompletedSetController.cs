@@ -48,24 +48,24 @@ namespace TrainingApp.Controllers
         }
 
 
-        [HttpPost(Name = "CreateSet")]
+        [HttpPost("{WorkoutSessionId}/{ExerciseId}", Name = "CreateSets")]
         [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] IEnumerable<CompletedSetAdd> newCompletedSets)
+        public async Task<IActionResult> Create([FromRoute] int WorkoutSessionId, [FromRoute] int ExerciseId, [FromBody] List<CompletedSetAdd> newCompletedSets)
         {
             List<CompletedSet> returnSets = new List<CompletedSet> ();
             foreach (var newCompletedSet in newCompletedSets)
             {
                 CompletedSet set = new CompletedSet
                 {
-                    WorkoutSessionId = newCompletedSet.WorkoutSessionId,
-                    ExerciseId = newCompletedSet.ExerciseId,
+                    WorkoutSessionId = WorkoutSessionId,
+                    ExerciseId = ExerciseId,
                     Reps = newCompletedSet.Reps,
                     Weight = newCompletedSet.Weight,
                     Notes = newCompletedSet.Notes
                 };
-                Session? session = await _dataBase.Sessions.FindAsync(newCompletedSet.WorkoutSessionId);
-                Exercise? exercise = await _dataBase.Exercises.FindAsync(newCompletedSet.ExerciseId);
+                Session? session = await _dataBase.Sessions.FindAsync(WorkoutSessionId);
+                Exercise? exercise = await _dataBase.Exercises.FindAsync(ExerciseId);
                 if (session == null || exercise == null)
                     return BadRequest();
                 exercise.LastWeight = newCompletedSet.Weight;
