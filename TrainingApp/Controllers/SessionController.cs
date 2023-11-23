@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TrainingApp.Data;
+using TrainingApp.Data.Migrations;
 using TrainingApp.Models;
 
 namespace TrainingApp.Controllers
@@ -121,12 +122,6 @@ namespace TrainingApp.Controllers
                 session.Status = Status.Completed;
                 currentUser.CurrentSessionId = 0;
             }
-
-            if (currentExerciseIndex == 0)
-            {
-                session.Status = Status.InProgress;
-                currentUser.CurrentSessionId = sessionId;
-            }
             else
             {
                 session.CurrentExerciseIndex = exerciseList[currentExerciseIndex + 1];
@@ -163,8 +158,11 @@ namespace TrainingApp.Controllers
                     .FirstOrDefault()
             };
 
-            _dataBase.Sessions.Add(session);
-
+            await _dataBase.Sessions.AddAsync(session);
+            await _dataBase.SaveChangesAsync();
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            currentUser.CurrentSessionId = session.SessionId;
             var workoutList = workout.Plan.Workouts.OrderBy(w => w.WorkoutId).ToList();
             var currentWorkoutIndex = workoutList.IndexOf(workout);
             workout.Plan.NextWorkoutId = workoutList[(currentWorkoutIndex + 1) % workoutList.Count].WorkoutId;
