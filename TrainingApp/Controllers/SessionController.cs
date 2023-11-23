@@ -74,7 +74,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpGet("{SessionId}/currentExercise", Name = "GetCurrentExercise")]
-        [ProducesResponseType(typeof(Exercise), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCurrentExercise([FromRoute] int SessionId)
         {
@@ -83,14 +83,7 @@ namespace TrainingApp.Controllers
             {
                 return NotFound("Invalid Session Number");
             }
-
-            var exerciseList = await _dataBase.ExerciseInWorkouts
-                .Where(exercise => exercise.WorkoutId == session.WorkoutId)
-                .OrderBy(e => e.Order)
-                .ToListAsync();
-
-            var exercise = await _dataBase.Exercises.FindAsync(exerciseList[session.CurrentExerciseIndex]);
-            return exercise == null ? NotFound() : Ok(exercise);
+            return Ok(session.CurrentExerciseIndex);
         }
 
         [HttpPatch("Complete/{sessionId}", Name = "CompleteSession")]
