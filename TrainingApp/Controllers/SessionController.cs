@@ -84,10 +84,12 @@ namespace TrainingApp.Controllers
                 return NotFound("Invalid Session Number");
             }
 
-            var exercise = await _dataBase.Exercises
-                .Include(e => e.User)
-                .FirstOrDefaultAsync(e => e.ExerciseId == session.CurrentExerciseIndex);
+            var exerciseList = await _dataBase.ExerciseInWorkouts
+                .Where(exercise => exercise.WorkoutId == session.WorkoutId)
+                .OrderBy(e => e.Order)
+                .ToListAsync();
 
+            var exercise = await _dataBase.Exercises.FindAsync(exerciseList[session.CurrentExerciseIndex]);
             return exercise == null ? NotFound() : Ok(exercise);
         }
 
@@ -96,6 +98,8 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> CompleteExercise([FromRoute] int sessionId)
         {
             var session = await _dataBase.Sessions.FindAsync(sessionId);
+            session.CurrentExerciseIndex++;
+
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -106,31 +110,18 @@ namespace TrainingApp.Controllers
 
             var exerciseList = _dataBase.ExerciseInWorkouts
                 .Where(e => e.WorkoutId == session.WorkoutId)
-                .OrderBy(e => e.ExerciseId)
-                .Select(e => e.ExerciseId)
                 .ToList();
 
-            var currentExerciseIndex = exerciseList.IndexOf(session.CurrentExerciseIndex);
-
-            if (currentExerciseIndex == -1)
-            {
-                return BadRequest();
-            }
-
-            if (currentExerciseIndex == exerciseList.Count - 1)
+            if (session.CurrentExerciseIndex == exerciseList.Count)
             {
                 session.Status = Status.Completed;
                 currentUser.CurrentSessionId = 0;
-            }
-            else
-            {
-                session.CurrentExerciseIndex = exerciseList[currentExerciseIndex + 1];
             }
 
             await _dataBase.SaveChangesAsync();
 
             return Ok();
-        }        
+        }
 
         [HttpPost("{WorkoutId}", Name = "CreateSession")]
         [ProducesResponseType(typeof(Session), StatusCodes.Status201Created)]
@@ -151,11 +142,7 @@ namespace TrainingApp.Controllers
                 WorkoutId = WorkoutId,
                 Date = DateTime.UtcNow,
                 Status = Status.InProgress,
-                CurrentExerciseIndex = _dataBase.ExerciseInWorkouts
-                    .Where(e => e.WorkoutId == WorkoutId)
-                    .OrderBy(e => e.ExerciseId)
-                    .Select(e => e.ExerciseId)
-                    .FirstOrDefault()
+                CurrentExerciseIndex = 0
             };
 
             await _dataBase.Sessions.AddAsync(session);
