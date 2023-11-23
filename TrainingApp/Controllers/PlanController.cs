@@ -114,19 +114,34 @@ namespace TrainingApp.Controllers
             {
                 return BadRequest("You need to sign in in order to delete a plan");
             }
-            var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => id == plan.PlanId && userId == plan.UserId);
-            if (plan == null)
+            try
             {
-                return NotFound();
+                var plan = await _dataBase.Plans.FirstOrDefaultAsync(plan => id == plan.PlanId && userId == plan.UserId);
+                if (plan == null)
+                {
+                    return NotFound();
+                }
+                _dataBase.Remove(plan);
+                _dataBase.SaveChanges();
+                var user = await _dataBase.Users.Include(u => u.Plans).FirstOrDefaultAsync(u => u.Id == userId);
+                if (user?.CurrentPlanId == plan?.PlanId && user.Plans.Count != 0)
+                {
+                    user.CurrentPlanId = user.Plans.ToList()[0].PlanId;
+                }
+                _dataBase.SaveChanges();
             }
-            _dataBase.Remove(plan);
-            _dataBase.SaveChanges();
-            var user = await _dataBase.Users.Include(u => u.Plans).FirstOrDefaultAsync(u => u.Id == userId);
-            if (user?.CurrentPlanId == plan?.PlanId && user.Plans.Count != 0)
+            catch (DbUpdateException ex)
             {
-                user.CurrentPlanId = user.Plans.ToList()[0].PlanId;
+                if (ex.InnerException is System.Data.SqlClient.SqlException sqlException
+                    && sqlException.Number == 547)
+                {
+                    // Foreign key constraint violation
+                    return BadRequest("Cannot delete this plan because it is referenced by other records.");
+                }
+
+                // Handle other types of DbUpdateException or rethrow if necessary
+                return StatusCode(500, "Cannot delete this record because it is referenced by other records.");
             }
-            _dataBase.SaveChanges();
             return Ok();
         }
 

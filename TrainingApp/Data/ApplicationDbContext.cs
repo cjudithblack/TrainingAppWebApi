@@ -42,7 +42,22 @@ namespace TrainingApp.Data
         public override int SaveChanges()
         {
             ChangeTracker.DetectChanges();
-            return base.SaveChanges();
+            try
+            {
+                return base.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Check if the exception is due to a foreign key constraint violation
+                if (ex.InnerException is System.Data.SqlClient.SqlException sqlException
+                    && sqlException.Number == 547)
+                {
+                    // Foreign key constraint violation
+                    throw new DbUpdateException("Cannot delete this record because it is referenced by other records.", ex);
+                }
+
+                throw;
+            }
         }
     }
 }
