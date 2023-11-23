@@ -85,7 +85,7 @@ namespace TrainingApp.Controllers
 
             var exercise = await _dataBase.Exercises
                 .Include(e => e.User)
-                .FirstOrDefaultAsync(e => e.ExerciseId == session.CurrentExerciseId);
+                .FirstOrDefaultAsync(e => e.ExerciseId == session.CurrentExerciseIndex);
 
             return exercise == null ? NotFound() : Ok(exercise);
         }
@@ -109,17 +109,11 @@ namespace TrainingApp.Controllers
                 .Select(e => e.ExerciseId)
                 .ToList();
 
-            var currentExerciseIndex = exerciseList.IndexOf(session.CurrentExerciseId);
+            var currentExerciseIndex = exerciseList.IndexOf(session.CurrentExerciseIndex);
 
             if (currentExerciseIndex == -1)
             {
                 return BadRequest();
-            }
-
-            if(currentExerciseIndex == 0)
-            {
-                session.Status = Status.InProgress;
-                currentUser.CurrentSessionId = sessionId;
             }
 
             if (currentExerciseIndex == exerciseList.Count - 1)
@@ -127,9 +121,15 @@ namespace TrainingApp.Controllers
                 session.Status = Status.Completed;
                 currentUser.CurrentSessionId = 0;
             }
+
+            if (currentExerciseIndex == 0)
+            {
+                session.Status = Status.InProgress;
+                currentUser.CurrentSessionId = sessionId;
+            }
             else
             {
-                session.CurrentExerciseId = exerciseList[currentExerciseIndex + 1];
+                session.CurrentExerciseIndex = exerciseList[currentExerciseIndex + 1];
             }
 
             await _dataBase.SaveChangesAsync();
@@ -156,7 +156,7 @@ namespace TrainingApp.Controllers
                 WorkoutId = WorkoutId,
                 Date = DateTime.UtcNow,
                 Status = Status.InProgress,
-                CurrentExerciseId = _dataBase.ExerciseInWorkouts
+                CurrentExerciseIndex = _dataBase.ExerciseInWorkouts
                     .Where(e => e.WorkoutId == WorkoutId)
                     .OrderBy(e => e.ExerciseId)
                     .Select(e => e.ExerciseId)

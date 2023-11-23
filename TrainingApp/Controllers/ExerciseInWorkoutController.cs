@@ -26,6 +26,7 @@ namespace TrainingApp.Controllers
                 .Include(eiw => eiw.Exercise)
                 .Include(eiw => eiw.Workout)
                 .Where(exercise => exercise.WorkoutId == workoutId)
+                .OrderBy(e => e.Order)
                 .ToListAsync());
         }
 
@@ -50,7 +51,7 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRelatedWorkouts([FromRoute] int exerciseId)
         {
-            List<ExerciseInWorkout> exerciseInWorkouts = 
+            List<ExerciseInWorkout> exerciseInWorkouts =
                 await _dataBase.ExerciseInWorkouts
                 .Where(eiw => eiw.ExerciseId == exerciseId)
                 .ToListAsync();
@@ -63,13 +64,21 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(typeof(ExerciseInWorkout), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutAdd newExerciseInWorkout)
         {
-            ExerciseInWorkout exerciseInWorkout = new ExerciseInWorkout { 
-                WorkoutId = WorkoutId, 
+            ExerciseInWorkout exerciseInWorkout = new ExerciseInWorkout
+            {
+                WorkoutId = WorkoutId,
                 ExerciseId = ExerciseId,
                 NumOfReps = newExerciseInWorkout.NumOfReps,
                 NumOfSets = newExerciseInWorkout.NumOfSets,
                 RestTime = newExerciseInWorkout.RestTime
             };
+
+            // Set the order based on existing exercises for the given WorkoutId
+            exerciseInWorkout.Order = _dataBase.ExerciseInWorkouts
+                .Where(e => e.WorkoutId == WorkoutId)
+                .Select(e => e.Order)
+                .DefaultIfEmpty(0)
+                .Max() + 1;
 
             Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
             Exercise? exercise = await _dataBase.Exercises.FindAsync(ExerciseId);

@@ -55,7 +55,7 @@ namespace TrainingApp.Controllers
             return BadRequest(ModelState);
         }
 
-        private async void AddDefaultExercises(User user, ApplicationDbContext dataBase)
+        private async Task<IActionResult> AddDefaultExercises(User user, ApplicationDbContext dataBase)
         {
             List<Exercise> defaultExerciseList = new List<Exercise>()
             {
@@ -75,6 +75,7 @@ namespace TrainingApp.Controllers
                 dataBase.Exercises.Add(exercise);
             }
             await dataBase.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpPost("login", Name = "Login")]
