@@ -93,6 +93,27 @@ namespace TrainingApp.Controllers
             return exercise == null ? NotFound() : Ok(exercise);
         }
 
+        [HttpPatch("Complete/{sessionId}", Name = "CompleteSession")]
+        public async Task<IActionResult> CompleteSession([FromRoute] int sessionId)
+        {
+            var session = await _dataBase.Sessions.FindAsync(sessionId);
+            if (session.Status != Status.InProgress)
+                return BadRequest("Session not in progress");
+            session.Status = Status.Completed;
+
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            currentUser.CurrentSessionId = 0;
+
+            if (session == null)
+            {
+                return BadRequest("Session not found");
+            }
+
+            await _dataBase.SaveChangesAsync();
+
+            return Ok();
+        }
 
         [HttpPatch("{sessionId}", Name = "CompleteExercise")]
         public async Task<IActionResult> CompleteExercise([FromRoute] int sessionId)
