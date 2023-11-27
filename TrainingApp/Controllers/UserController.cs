@@ -44,7 +44,8 @@ namespace TrainingApp.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    AddDefaultExercises(user, _dataBase);
+                    await AddDefaultExercises(user, _dataBase);
+                    await _dataBase.SaveChangesAsync();
                     return Ok(new { message = "Registration successful" });
                 }
                 else
