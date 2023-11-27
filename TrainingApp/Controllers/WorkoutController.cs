@@ -134,13 +134,28 @@ namespace TrainingApp.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var workout = await _dataBase.Workouts.FindAsync(id);
-            if (workout != null)
+            try
             {
-                _dataBase.Remove(workout);
-                _dataBase.SaveChanges();
-                return Ok();
+                if (workout != null)
+                {
+                    _dataBase.Remove(workout);
+                    _dataBase.SaveChanges();
+                    return Ok();
+                }
+                return NotFound();
             }
-            return NotFound();
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is System.Data.SqlClient.SqlException sqlException
+                    && sqlException.Number == 547)
+                {
+                    // Foreign key constraint violation
+                    return BadRequest("Cannot delete this workout because it is referenced by other records.");
+                }
+
+                // Handle other types of DbUpdateException or rethrow if necessary
+                return StatusCode(500, "Cannot delete this record because it is referenced by other records.");
+            }
         }
 
     }
