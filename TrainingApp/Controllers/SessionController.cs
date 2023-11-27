@@ -86,23 +86,18 @@ namespace TrainingApp.Controllers
             return Ok(session.CurrentExerciseIndex);
         }
 
-        [HttpPatch("Complete/{sessionId}", Name = "CompleteSession")]
-        public async Task<IActionResult> CompleteSession([FromRoute] int sessionId)
+        [HttpPatch(Name = "CompleteSession")]
+        public async Task<IActionResult> CompleteSession()
         {
-            var session = await _dataBase.Sessions.FindAsync(sessionId);
-            if (session.Status != Status.InProgress)
-                return BadRequest("Session not in progress");
-            session.Status = Status.Completed;
-
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var sessionId = currentUser.CurrentSessionId;
+            var session = await _dataBase.Sessions.FindAsync(sessionId);
+            if (sessionId == 0 || session == null || session.Status != Status.InProgress)
+                return BadRequest("no session in progress");
+
+            session.Status = Status.Completed;
             currentUser.CurrentSessionId = 0;
-
-            if (session == null)
-            {
-                return BadRequest("Session not found");
-            }
-
             await _dataBase.SaveChangesAsync();
 
             return Ok();
