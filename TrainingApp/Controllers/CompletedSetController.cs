@@ -46,35 +46,36 @@ namespace TrainingApp.Controllers
 
             return Ok(groupedSets);
         }
-
-
-        [HttpPost("{WorkoutSessionId}/{ExerciseId}", Name = "CreateSets")]
-        [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromRoute] int WorkoutSessionId, [FromRoute] int ExerciseId, [FromBody] List<CompletedSetAdd> newCompletedSets)
+        
+        [HttpPut("Update/{SessionId}/{ExerciseId}", Name = "UpdateAllSetsInSession")]
+        public async Task<IActionResult> UpdateAllExercisesInWorkout([FromRoute] int SessionId, [FromRoute] int ExerciseId, [FromBody] List<CompletedSetAdd> newCompletedSets)
         {
-            List<CompletedSet> returnSets = new List<CompletedSet> ();
-            foreach (var newCompletedSet in newCompletedSets)
+            var currentSetList = await _dataBase.CompletedSets.Where(set => set.WorkoutSessionId == SessionId).ToListAsync();
+            foreach (var set in currentSetList)
             {
-                CompletedSet set = new CompletedSet
-                {
-                    WorkoutSessionId = WorkoutSessionId,
-                    ExerciseId = ExerciseId,
-                    Reps = newCompletedSet.Reps,
-                    Weight = newCompletedSet.Weight,
-                    Notes = newCompletedSet.Notes
-                };
-                Session? session = await _dataBase.Sessions.FindAsync(WorkoutSessionId);
-                Exercise? exercise = await _dataBase.Exercises.FindAsync(ExerciseId);
-                if (session == null || exercise == null)
-                    return BadRequest();
-                exercise.LastWeight = newCompletedSet.Weight;
-                await _dataBase.CompletedSets.AddAsync(set);
-                await _dataBase.SaveChangesAsync();
-                returnSets.Add(set);
+                _dataBase.Remove(set);
             }
-            return Ok(returnSets);
+            foreach (var set in newCompletedSets)
+            {
+                CompletedSet completedSet = new CompletedSet
+                {
+                    ExerciseId = ExerciseId,
+                    WorkoutSessionId = SessionId,
+                    Reps = set.Reps,
+                    Weight = set.Weight,
+                    Notes = set.Notes
+                };
+                Exercise? exercise = await _dataBase.Exercises.FindAsync(ExerciseId);
+                Session? session = await _dataBase.Sessions.FindAsync(SessionId);
+                if (session == null || exercise == null)
+                    return BadRequest(ModelState);
+                await _dataBase.CompletedSets.AddAsync(completedSet);
+                await _dataBase.SaveChangesAsync();
+            }
+            return Ok();
         }
+
+
     }
 
 
