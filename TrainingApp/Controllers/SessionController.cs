@@ -92,14 +92,21 @@ namespace TrainingApp.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var currentUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var sessionId = currentUser.CurrentSessionId;
-            var session = await _dataBase.Sessions.FindAsync(sessionId);
+            var session = await _dataBase.Sessions.
+                Include(s => s.CompletedSets).
+                FirstOrDefaultAsync(s => s.SessionId == sessionId);
             if (sessionId == 0 || session == null || session.Status != Status.InProgress)
                 return BadRequest("no session in progress");
-
+            if (!session.CompletedSets.Any())
+            {
+                _dataBase.Sessions.Remove(session);
+                currentUser.CurrentSessionId = 0;
+                _dataBase.SaveChanges();
+                return Ok("Completed a session without any sets, deleting session");
+            }
             session.Status = Status.Completed;
             currentUser.CurrentSessionId = 0;
             await _dataBase.SaveChangesAsync();
-
             return Ok();
         }
 
