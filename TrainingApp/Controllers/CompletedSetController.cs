@@ -50,7 +50,7 @@ namespace TrainingApp.Controllers
         [HttpPut("Update/{SessionId}/{ExerciseId}", Name = "UpdateAllSetsInSession")]
         public async Task<IActionResult> UpdateAllExercisesInWorkout([FromRoute] int SessionId, [FromRoute] int ExerciseId, [FromBody] List<CompletedSetAdd> newCompletedSets)
         {
-            var currentSetList = await _dataBase.CompletedSets.Where(set => set.WorkoutSessionId == SessionId).ToListAsync();
+            var currentSetList = await _dataBase.CompletedSets.Where(set => set.WorkoutSessionId == SessionId && set.ExerciseId == ExerciseId).ToListAsync();
             foreach (var set in currentSetList)
             {
                 _dataBase.Remove(set);
