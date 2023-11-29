@@ -117,6 +117,7 @@ namespace TrainingApp.Controllers
             {
                 _dataBase.Remove(exercise);
             }
+            int orderIndex = 0;
             foreach (var eiw in ExerciseInWorkoutList)
             {
                 ExerciseInWorkout exerciseInWorkout = new ExerciseInWorkout
@@ -125,7 +126,8 @@ namespace TrainingApp.Controllers
                     ExerciseId = eiw.exerciseId,
                     NumOfReps = eiw.NumOfReps,
                     NumOfSets = eiw.NumOfSets,
-                    RestTime = eiw.RestTime
+                    RestTime = eiw.RestTime,
+                    Order = orderIndex++
                 };
                 Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
                 Exercise? exercise = await _dataBase.Exercises.FindAsync(eiw.exerciseId);
