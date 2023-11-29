@@ -93,6 +93,9 @@ namespace TrainingApp.Controllers
         [HttpPut("Update/{WorkoutId}/{ExerciseId}", Name = "UpdateExerciseInWorkout")]
         public async Task<IActionResult> UpdateExerciseInWorkout([FromRoute] int WorkoutId, [FromRoute] int ExerciseId, [FromBody] ExerciseInWorkoutUpdate updatedExerciseInWorkout)
         {
+            Workout? workout = await _dataBase.Workouts.Include(w => w.Plan).FirstOrDefaultAsync(w => w.WorkoutId == WorkoutId);
+            if (workout.Plan.NextWorkoutId == WorkoutId)
+                return BadRequest("Can not edit workout in progress");
             ExerciseInWorkout? exerciseInWorkout = await _dataBase.ExerciseInWorkouts.FirstOrDefaultAsync(e => e.WorkoutId == WorkoutId && e.ExerciseId == ExerciseId);
             if (exerciseInWorkout != null)
             {

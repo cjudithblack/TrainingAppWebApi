@@ -100,7 +100,7 @@ namespace TrainingApp.Controllers
                 Description = newWorkout.Description,
                 PlanId = planId
             };
-            Plan? plan = await _dataBase.Plans.FindAsync(planId);
+            Plan? plan = await _dataBase.Plans.Include(p => p.Workouts).FirstOrDefaultAsync(p => p.PlanId == planId);
             if (plan == null)
                 return BadRequest(ModelState);
             await _dataBase.Workouts.AddAsync(workout);
