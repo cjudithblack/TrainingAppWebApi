@@ -6,5 +6,7 @@
         public int NumOfSets { get; set; }
         public int NumOfReps { get; set; }
         public TimeSpan? RestTime { get; set; }
+        public string? Notes { get; set; }
+
     }
 }

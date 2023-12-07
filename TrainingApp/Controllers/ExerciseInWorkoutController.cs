@@ -127,6 +127,7 @@ namespace TrainingApp.Controllers
                     NumOfReps = eiw.NumOfReps,
                     NumOfSets = eiw.NumOfSets,
                     RestTime = eiw.RestTime,
+                    Notes = eiw.Notes,
                     Order = orderIndex++
                 };
                 Workout? workout = await _dataBase.Workouts.FindAsync(WorkoutId);
