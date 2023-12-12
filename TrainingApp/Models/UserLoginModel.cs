@@ -5,7 +5,6 @@ namespace TrainingApp.Models
     public class UserLoginModel
     {
         [Required]
-        [EmailAddress]
         public string UserName { get; set; }
 
         [Required]
