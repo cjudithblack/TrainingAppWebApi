@@ -133,13 +133,22 @@ namespace TrainingApp.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var workout = await _dataBase.Workouts.FindAsync(id);
+            var workout = await _dataBase.Workouts
+                .Include(w => w.Plan)
+                .ThenInclude(p => p.Workouts)
+                .FirstOrDefaultAsync(w => w.WorkoutId == id);
             try
             {
                 if (workout != null)
                 {
                     var relatedExercises = _dataBase.ExerciseInWorkouts.Where(e => e.WorkoutId == id);
                     _dataBase.ExerciseInWorkouts.RemoveRange(relatedExercises);
+                    if(workout.Plan.NextWorkoutId == id) 
+                    {
+                        var workoutList = workout.Plan.Workouts.OrderBy(w => w.WorkoutId).ToList();
+                        var currentWorkoutIndex = workoutList.IndexOf(workout);
+                        workout.Plan.NextWorkoutId = workoutList[(currentWorkoutIndex + 1) % workoutList.Count].WorkoutId;
+                    }
                     _dataBase.Remove(workout);
                     _dataBase.SaveChanges();
                     return Ok();
