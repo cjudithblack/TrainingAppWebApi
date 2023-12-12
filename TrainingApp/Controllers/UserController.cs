@@ -38,7 +38,7 @@ namespace TrainingApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User(model.FirstName, model.LastName, model.Email);
+                var user = new User(model.FirstName, model.LastName, model.UserName);
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
