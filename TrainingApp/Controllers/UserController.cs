@@ -60,16 +60,16 @@ namespace TrainingApp.Controllers
         {
             List<Exercise> defaultExerciseList = new List<Exercise>()
             {
-                new Exercise{Name = "Squats"     ,   Description = "Bend your knees and lower your body as if you're sitting down. Keep your back straight and your chest up. Push through your heels as you return to a standing position. Great for building leg strength and improving posture." ,
-                             UserId = user.Id    ,   VideoUrl = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/AIZ8q1qruKw\" title=\"How to Perform a PERFECT Squat\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
-                new Exercise{Name = "Push-ups"   ,   Description = "Start in a plank position, lower your body by bending your elbows, and then push back up. Keep your body straight throughout the movement. Excellent for strengthening your chest, arms, and core.",
-                             UserId = user.Id    ,   VideoUrl = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/ATink4Ix84A\" title=\"💪🏽 6 PUSH UP VARIATIONS TO BUILD A STRONGER CHEST, TRICEPS, SHOULDERS &amp; BACK 🔥\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
-                new Exercise{Name = "Lunges"     ,   Description = "Step forward with one leg and lower your body until your front thigh is parallel to the ground. Push back up to the starting position. Repeat with the other leg. Helps build leg strength and improve balance."                ,
-                             UserId = user.Id    ,   VideoUrl = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/kn431INOxig\" title=\"How To Do Lunges: Lunge Progression Exercises\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
-                new Exercise{Name = "Plank"      ,   Description = "Hold a position similar to the top of a push-up, with your body forming a straight line from head to heels. Engage your core muscles and hold for as long as you can. Effective for building core strength and stability."      ,
-                             UserId = user.Id    ,   VideoUrl = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/wZo1k2-3Zn4\" title=\"How to Do a Plank Safely\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
-                new Exercise{Name = "Bicep Curls",   Description = "Hold a dumbbell in each hand, palms facing up. Bend your elbows and curl the weights toward your shoulders, then lower them back down. A great way to strengthen and tone your biceps."                                         ,
-                             UserId = user.Id    ,   VideoUrl = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/09AYfVFf7pg\" title=\"Dumbbell bicep curls\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
+                new Exercise{Name = "Squats"     ,   Instructions = "Bend your knees and lower your body as if you're sitting down. Keep your back straight and your chest up. Push through your heels as you return to a standing position. Great for building leg strength and improving posture." ,
+                             UserId = user.Id    ,   VideoId = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/AIZ8q1qruKw\" title=\"How to Perform a PERFECT Squat\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
+                new Exercise{Name = "Push-ups"   ,   Instructions = "Start in a plank position, lower your body by bending your elbows, and then push back up. Keep your body straight throughout the movement. Excellent for strengthening your chest, arms, and core.",
+                             UserId = user.Id    ,   VideoId = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/ATink4Ix84A\" title=\"💪🏽 6 PUSH UP VARIATIONS TO BUILD A STRONGER CHEST, TRICEPS, SHOULDERS &amp; BACK 🔥\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
+                new Exercise{Name = "Lunges"     ,   Instructions = "Step forward with one leg and lower your body until your front thigh is parallel to the ground. Push back up to the starting position. Repeat with the other leg. Helps build leg strength and improve balance."                ,
+                             UserId = user.Id    ,   VideoId = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/kn431INOxig\" title=\"How To Do Lunges: Lunge Progression Exercises\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
+                new Exercise{Name = "Plank"      ,   Instructions = "Hold a position similar to the top of a push-up, with your body forming a straight line from head to heels. Engage your core muscles and hold for as long as you can. Effective for building core strength and stability."      ,
+                             UserId = user.Id    ,   VideoId = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/wZo1k2-3Zn4\" title=\"How to Do a Plank Safely\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
+                new Exercise{Name = "Bicep Curls",   Instructions = "Hold a dumbbell in each hand, palms facing up. Bend your elbows and curl the weights toward your shoulders, then lower them back down. A great way to strengthen and tone your biceps."                                         ,
+                             UserId = user.Id    ,   VideoId = "<iframe width=\"320\" height=\"560\" src=\"https://www.youtube.com/embed/09AYfVFf7pg\" title=\"Dumbbell bicep curls\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>" },
 };
             foreach (var exercise in defaultExerciseList)
             {
@@ -85,8 +85,8 @@ namespace TrainingApp.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = _userManager.FindByEmailAsync(model.Email).Result;
-                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var user = _userManager.FindByNameAsync(model.UserName).Result;
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, false, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     // Create claims for the user

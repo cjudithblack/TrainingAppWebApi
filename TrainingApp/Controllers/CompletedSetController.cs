@@ -31,8 +31,19 @@ namespace TrainingApp.Controllers
 
         [HttpGet("Session/{Id}", Name = "GetCompletedSetsBySessionId")]
         [ProducesResponseType(typeof(IEnumerable<GroupedSetResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]        
-        
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromRoute] int Id)
+        {
+            var groupedSets = _dataBase.CompletedSets
+                .Where(set => set.WorkoutSessionId == Id)
+                .GroupBy(set => set.ExerciseId)
+                .Select(group => new GroupedSetResponse
+                {
+                    Exercise = _dataBase.Exercises.FirstOrDefault(exercise => exercise.ExerciseId == group.Key),
+                    Sets = group.ToList()
+                });
+                return Ok(groupedSets);
+        }
         [HttpGet("Session/{Id}/{exerciseId}", Name = "GetCompletedSetsBySessionIdAndExerciseId")]
         [ProducesResponseType(typeof(IEnumerable<CompletedSet>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -45,7 +56,7 @@ namespace TrainingApp.Controllers
                 return Ok(completedSets);
             return NotFound();
         }
-        
+
         [HttpPut("Update/{SessionId}/{ExerciseId}", Name = "UpdateAllSetsInSession")]
         public async Task<IActionResult> UpdateAllExercisesInWorkout([FromRoute] int SessionId, [FromRoute] int ExerciseId, [FromBody] List<CompletedSetAdd> newCompletedSets)
         {
@@ -62,7 +73,6 @@ namespace TrainingApp.Controllers
                     WorkoutSessionId = SessionId,
                     Reps = set.Reps,
                     Weight = set.Weight,
-                    Notes = set.Notes
                 };
                 Exercise? exercise = await _dataBase.Exercises.FindAsync(ExerciseId);
                 Session? session = await _dataBase.Sessions.FindAsync(SessionId);

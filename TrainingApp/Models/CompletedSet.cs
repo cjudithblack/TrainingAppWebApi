@@ -9,9 +9,8 @@ namespace TrainingApp.Models
         public int SetId { get; set; }
         public int ExerciseId { get; set; }
         public int WorkoutSessionId { get; set; }
-        public int? Weight { get; set; }
+        public double? Weight { get; set; }
         public int? Reps { get; set; }
-        public string? Notes { get; set; }
 
         [ForeignKey("WorkoutSessionId")]
         public virtual Session? ParentWorkoutSession { get; set; }

@@ -84,7 +84,7 @@ namespace TrainingApp.Controllers
 
         [HttpPost("/Plans/{planId}/CreateWorkout", Name = "CreateWorkout")]
         [ProducesResponseType(typeof(Workout), StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(WorkoutAdd newWorkout, [FromRoute] int planId)
+        public async Task<IActionResult> Create(WorkoutInfo newWorkout, [FromRoute] int planId)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             string? plansUser = _dataBase.Plans.Find(planId)?.UserId;
@@ -114,7 +114,7 @@ namespace TrainingApp.Controllers
 
 
         [HttpPut("UpdateWorkout/{id}", Name = "UpdateWorkoutById")]
-        public async Task<IActionResult> UpdateWorkout([FromRoute] int id, [FromBody] WorkoutUpdate updatedWorkout)
+        public async Task<IActionResult> UpdateWorkout([FromRoute] int id, [FromBody] WorkoutInfo updatedWorkout)
         {
             var workout = await _dataBase.Workouts.FindAsync(id);
             if (workout != null)

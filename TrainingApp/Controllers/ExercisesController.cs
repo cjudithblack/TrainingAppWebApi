@@ -48,7 +48,7 @@ namespace TrainingApp.Controllers
 
         [HttpPost("CreateExercise", Name = "CreateExercise")]
         [ProducesResponseType(typeof(Exercise), StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody] ExerciseAdd newExercise)
+        public async Task<IActionResult> Create([FromBody] ExerciseInfo newExercise)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Exercise? exerciseNameExists = _dataBase.Exercises.FirstOrDefaultAsync(e => e.UserId == userId && e.Name == newExercise.Name).Result;
@@ -57,8 +57,8 @@ namespace TrainingApp.Controllers
             Exercise exercise = new Exercise
             {
                 Name = newExercise.Name,
-                Description = newExercise.Description,
-                VideoUrl = newExercise.VideoUrl,
+                Instructions = newExercise.Instructions,
+                VideoId = newExercise.VideoId,
                 UserId = userId
             };
             await _dataBase.Exercises.AddAsync(exercise);
@@ -68,14 +68,14 @@ namespace TrainingApp.Controllers
 
 
         [HttpPut("UpdateExercise/{id}", Name = "UpdateExercise")]
-        public async Task<IActionResult> UpdateExercise([FromRoute] int id, [FromBody] ExerciseUpdate updatedExercise)
+        public async Task<IActionResult> UpdateExercise([FromRoute] int id, [FromBody] ExerciseInfo updatedExercise)
         {
             var exercise = await _dataBase.Exercises.FindAsync(id);
             if (exercise != null)
             {
                 exercise.Name = updatedExercise.Name;
-                exercise.Description = updatedExercise.Description;
-                exercise.VideoUrl = updatedExercise.VideoUrl;
+                exercise.Instructions = updatedExercise.Instructions;
+                exercise.VideoId = updatedExercise.VideoId;
                 await _dataBase.SaveChangesAsync();
                 return Ok(exercise);
             }

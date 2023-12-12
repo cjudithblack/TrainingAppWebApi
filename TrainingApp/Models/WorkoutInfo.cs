@@ -1,6 +1,6 @@
 ﻿namespace TrainingApp.Models
 {
-    public class WorkoutAdd
+    public class WorkoutInfo
     {
         public string Name { get; set; }
         public string Description { get; set; }
