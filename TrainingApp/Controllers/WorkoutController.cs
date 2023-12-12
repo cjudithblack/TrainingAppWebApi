@@ -138,6 +138,8 @@ namespace TrainingApp.Controllers
             {
                 if (workout != null)
                 {
+                    var relatedExercises = _dataBase.ExerciseInWorkouts.Where(e => e.WorkoutId == id);
+                    _dataBase.ExerciseInWorkouts.RemoveRange(relatedExercises);
                     _dataBase.Remove(workout);
                     _dataBase.SaveChanges();
                     return Ok();
