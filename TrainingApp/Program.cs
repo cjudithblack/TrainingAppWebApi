@@ -74,10 +74,16 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireLowercase = false; 
     options.Password.RequireUppercase = false; 
     options.Password.RequireNonAlphanumeric = false; 
-    options.Password.RequiredLength = 4; 
+    options.Password.RequiredLength = 4;
+    options.SignIn.RequireConfirmedEmail = false;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Lockout.AllowedForNewUsers = false;
+});
 
 builder.Services.Configure<IdentityOptions>(options =>
     options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);

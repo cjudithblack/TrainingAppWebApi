@@ -18,7 +18,6 @@ namespace TrainingApp.Models
             this.UserName = userName;
             this.Plans = new HashSet<Plan>();
             this.Exercises = new HashSet<Exercise>();
-            this.Email = "user@default.com";
         }
         public string FirstName { get; set; }
         public string LastName {  get; set; }
